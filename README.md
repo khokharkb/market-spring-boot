@@ -1,94 +1,96 @@
-# 🛒 Market — Plateforme de petites annonces
+# 🛒 Market — Classified Ads Marketplace
 
-Application web de type **marketplace** permettant aux utilisateurs d'acheter, vendre et échanger des articles via des petites annonces. Le projet comprend une **application web** (Spring Boot + Thymeleaf) et une **application mobile Android** (Capacitor) connectée à une API REST.
+A **marketplace** web application where users can buy, sell and trade items through classified ads. The project includes a **web application** (Spring Boot + Thymeleaf) and an **Android mobile app** (Capacitor) connected to a REST API.
 
-![Page d'accueil](docs/screenshots/home.png)
+![Home page](docs/screenshots/home.png)
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-**Utilisateurs**
-- 🔐 Inscription et connexion sécurisées (Spring Security, mots de passe chiffrés)
-- 👤 Profil utilisateur modifiable
+**Users**
+- 🔐 Secure registration and login (Spring Security, hashed passwords)
+- 👤 Editable user profile
 
-**Annonces**
-- 📝 Publication d'annonces avec photos, prix et description
-- 🗂️ Classement par catégories (Maison, Mode, Santé, Électronique, Autre)
-- 🔍 Recherche d'annonces
-- 📋 Gestion de ses propres annonces (« Mes annonces »)
+**Listings**
+- 📝 Post ads with photos, price and description
+- 🗂️ Browse by category (Home, Fashion, Health, Electronics, Other)
+- 🔍 Search listings
+- 📋 Manage your own listings ("My ads")
 
 **Interaction**
-- ❤️ Favoris
-- 🛍️ Panier
-- 💬 Messagerie entre acheteurs et vendeurs
-- ⭐ Système de notation
+- ❤️ Favorites
+- 🛍️ Shopping cart
+- 💬 Messaging between buyers and sellers
+- ⭐ Rating system
 
 **Administration**
-- 📊 Tableau de bord administrateur
+- 📊 Admin dashboard
 
 **Mobile**
-- 📱 Application Android (Capacitor) utilisant une API REST dédiée
+- 📱 Android app (Capacitor) using a dedicated REST API
 
 ---
 
-## 🛠️ Technologies
+## 🛠️ Tech Stack
 
-| Couche | Technologies |
+| Layer | Technologies |
 |---|---|
 | Backend | Java 21, Spring Boot 4, Spring Security, Spring Data JPA (Hibernate) |
-| Frontend web | Thymeleaf, HTML, CSS |
-| Base de données | MySQL |
+| Web frontend | Thymeleaf, HTML, CSS |
+| Database | MySQL |
 | Mobile | Capacitor (Android), JavaScript |
-| Outils | Maven, Lombok, Git |
+| Tools | Maven, Lombok, Git |
 
 ---
 
-## 📸 Captures d'écran
+## 📸 Screenshots
 
-| Accueil | Annonces récentes |
+| Home | Recent listings |
 |---|---|
-| ![Accueil](docs/screenshots/home.png) | ![Annonces](docs/screenshots/annonces.png) |
+| ![Home](docs/screenshots/home.png) | ![Listings](docs/screenshots/annonces.png) |
+
+> The interface is in French.
 
 ---
 
-## 🚀 Lancer le projet en local
+## 🚀 Running Locally
 
-### Prérequis
+### Prerequisites
 - Java 21
 - MySQL 8
-- (Optionnel, pour le mobile) Node.js et Android Studio
+- (Optional, for mobile) Node.js and Android Studio
 
-### 1. Cloner le projet
+### 1. Clone the repository
 ```bash
 git clone https://github.com/khokharkb/market-spring-boot.git
 cd market-spring-boot
 ```
 
-### 2. Configurer la base de données
-La base `market` est créée automatiquement au démarrage.
-Si votre MySQL n'utilise pas le port `3307`, modifiez l'URL dans `src/main/resources/application.properties` :
+### 2. Configure the database
+The `market` database is created automatically on startup.
+If your MySQL server doesn't run on port `3307`, update the URL in `src/main/resources/application.properties`:
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/market?createDatabaseIfNotExist=true
 ```
 
-### 3. Définir les variables d'environnement
-Les mots de passe ne sont pas stockés dans le code :
+### 3. Set environment variables
+Passwords are not stored in the code:
 
 | Variable | Description |
 |---|---|
-| `DB_PASSWORD` | Mot de passe MySQL (utilisateur `root`) |
-| `ADMIN_PASSWORD` | Mot de passe du compte administrateur créé au démarrage |
+| `DB_PASSWORD` | MySQL password (user `root`) |
+| `ADMIN_PASSWORD` | Password for the admin account created on startup |
 
-Sous IntelliJ : *Run → Edit Configurations → Environment variables*.
+In IntelliJ: *Run → Edit Configurations → Environment variables*.
 
-### 4. Démarrer l'application
+### 4. Start the application
 ```bash
 ./mvnw spring-boot:run
 ```
-Puis ouvrir **http://localhost:8080**
+Then open **http://localhost:8080**
 
-### 5. (Optionnel) Application mobile
+### 5. (Optional) Mobile app
 ```bash
 npm install
 npx cap sync android
@@ -97,23 +99,23 @@ npx cap open android
 
 ---
 
-## 📁 Structure du projet
+## 📁 Project Structure
 
 ```
 src/main/java/org/example/market/
-├── admin/        # Tableau de bord administrateur
-├── annonce/      # Gestion des annonces et des images
-├── api/mobile/   # API REST pour l'application mobile
-├── favoris/      # Favoris
-├── message/      # Messagerie
-├── panier/       # Panier
-├── rating/       # Notation
-├── security/     # Authentification et sécurité
-└── user/         # Utilisateurs et profils
+├── admin/        # Admin dashboard
+├── annonce/      # Listings and image uploads
+├── api/mobile/   # REST API for the mobile app
+├── favoris/      # Favorites
+├── message/      # Messaging
+├── panier/       # Shopping cart
+├── rating/       # Ratings
+├── security/     # Authentication and security
+└── user/         # Users and profiles
 ```
 
 ---
 
-## 👩‍💻 Auteur
+## 👩‍💻 Author
 
 **Khouloud** — [GitHub](https://github.com/khokharkb)
