@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market - Plateforme de petites annonces</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles pour le système de login */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-modal {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .login-btn-submit {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-error {
+            color: #e74c3c;
+            margin: 10px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        /* Assure que les boutons sont cliquables */
+        button, a, input[type="submit"] {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Pour Android: rend les éléments plus réactifs */
+        .add-btn, .login-btn, .search-btn, .message-btn, .profile-btn {
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Message dropdown fix */
+        .message-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            min-width: 300px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .message-dropdown.active .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <h2><i class="fas fa-store"></i> Market</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <form action="#" method="get" id="searchForm">
+            <input type="text" name="search" placeholder="Rechercher des annonces..." class="search-bar">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <nav class="nav-container">
+        <!-- Buttons -->
+        <button class="add-btn" onclick="openAddAnnouncement()"><i class="fas fa-plus-circle"></i> Déposer une annonce</button>
+        <button class="add-btn" onclick="openLogin()"><i class="fas fa-sign-in-alt"></i> Se connecter pour publier</button>
+
+        <!-- Shopping Cart Icon -->
+        <div class="cart-dropdown">
+            <button class="cart-btn icon-btn" onclick="openCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </button>
+        </div>
+
+        <!-- Messages Dropdown -->
+        <div class="message-dropdown">
+            <button class="message-btn" id="messageToggle" onclick="toggleMessages()">
+                <i class="fas fa-envelope"></i>
+                <span class="message-badge">0</span>
+            </button>
+            <div class="dropdown-content">
+                <div class="message-dropdown-header">
+                    <i class="fas fa-inbox"></i> Messages récents
+                    <span class="badge">0 non lus</span>
+                </div>
+                <div class="message-list">
+                    <div class="message-item">
+                        <a class="dropdown-item" href="#">
+                            <div class="message-sender">Utilisateur</div>
+                            <div class="message-preview">Message exemple...</div>
+                            <div class="message-time">12:00</div>
+                        </a>
+                    </div>
+                </div>
+                <div class="no-messages">
+                    <i class="fas fa-inbox"></i> Aucun message
+                </div>
+                <a href="#" class="see-all-messages"><i class="fas fa-external-link-alt"></i> Voir tous les messages</a>
+            </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="profile-dropdown">
+            <div class="dropdown">
+                <button class="profile-btn" onclick="toggleProfile()">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="dropdown-content" id="profileDropdown">
+                    <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Mon profil</a>
+                    <a href="#" onclick="openMyAnnouncements()"><i class="fas fa-list"></i> Mes annonces</a>
+                    <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+                </div>
+            </div>
+            <button class="login-btn" onclick="openLogin()"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+        </div>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main>
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Bienvenue sur <span class="highlight">Market</span></h1>
+            <p class="hero-subtitle">La plateforme de petites annonces #1</p>
+            <p class="hero-description">Achetez, vendez, échangez en toute simplicité. Des milliers d'annonces dans toutes les catégories.</p>
+        </div>
+    </section>
+
+    <!-- Example Category Section -->
+    <section class="category-filter">
+        <h2><i class="fas fa-filter"></i> Catégories</h2>
+        <div class="categories-grid">
+            <button class="category-card" onclick="filterCategory('electronique')">
+                <i class="fas fa-laptop"></i>
+                <span>Electronique</span>
+            </button>
+            <button class="category-card" onclick="filterCategory('vehicules')">
+                <i class="fas fa-car"></i>
+                <span>Véhicules</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Example Featured Announcements -->
+    <section class="featured-section">
+        <div class="annonces-grid">
+            <div class="annonce-card">
+                <div class="category-badge">Electronique</div>
+                <div class="annonce-image">
+                    <img src="images/default.jpg" alt="Image annonce">
+                    <div class="image-overlay">
+                        <button class="btn-view" onclick="viewAnnouncement(1)"><i class="fas fa-eye"></i> Voir</button>
+                    </div>
+                </div>
+                <div class="annonce-content">
+                    <h3 class="annonce-title">Titre exemple</h3>
+                    <div class="annonce-price">1000 DA</div>
+                    <p class="annonce-description">Description de l'annonce...</p>
+                    <button class="btn-details" onclick="viewDetails(1)"><i class="fas fa-info-circle"></i> Voir détails</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3><i class="fas fa-store"></i> Market</h3>
+            <p>La plateforme de petites annonces</p>
+        </div>
+        <div class="footer-section">
+            <h3>Navigation</h3>
+            <ul>
+                <li><button onclick="goHome()">Accueil</button></li>
+                <li><button onclick="viewAllAnnouncements()">Toutes les annonces</button></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<!-- LOGIN MODAL - Modifie cette section -->
+<div id="loginOverlay" class="login-overlay" style="display: none;">
+    <div class="login-modal">
+        <button class="close-btn">&times;</button>
+
+        <div class="login-tabs">
+            <button class="tab-btn active">Se connecter</button>
+            <button class="tab-btn">S'inscrire</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="tab-content active">
+            <input type="email" id="loginEmail" placeholder="Email" class="login-input" required>
+            <input type="password" id="loginPassword" placeholder="Mot de passe" class="login-input" required>
+            <button type="submit" class="login-btn-submit">Se connecter</button>
+            <div id="loginError" class="login-error"></div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="tab-content">
+            <input type="text" id="registerName" placeholder="Nom complet" class="login-input" required>
+            <input type="email" id="registerEmail" placeholder="Email" class="login-input" required>
+            <input type="password" id="registerPassword" placeholder="Mot de passe" class="login-input" required>
+            <input type="password" id="registerConfirm" placeholder="Confirmer mot de passe" class="login-input" required>
+            <button type="submit" class="login-btn-submit">S'inscrire</button>
+            <div id="registerError" class="login-error"></div>
+        </form>
+    </div>
+</div>
+
+<!-- JS -->
+<!-- SUPPRIMEZ l'ancienne balise script et mettez ceci : -->
+<script src="js/app.js"></script>S</body>
+</html>

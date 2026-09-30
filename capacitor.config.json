@@ -1,0 +1,22 @@
+{
+  "appId": "com.example.market",
+  "appName": "market",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "http://192.168.30.3:8080",
+    "cleartext": true,
+    "allowNavigation": [
+      "http://192.168.100.8:8080",
+      "http://192.168.100.*:8080",
+      "http://192.168.30.3:8080",
+      "http://192.168.30.*:8080",
+      "http://localhost:8080",
+      "capacitor://localhost"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

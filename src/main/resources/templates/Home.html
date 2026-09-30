@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market - Plateforme de petites annonces</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-store"></i> Market
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <form th:action="@{/}" method="get">
+            <input type="text" name="search" placeholder="Rechercher des annonces..." class="search-bar"
+                   th:value="${search}">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <nav class="nav-container">
+        <!-- Add Announcement Button - Shows "Se connecter" if not authenticated -->
+        <a th:href="@{/annonces/new}" class="add-btn" sec:authorize="isAuthenticated()">
+            <i class="fas fa-plus-circle"></i> Déposer une annonce
+        </a>
+        <a th:href="@{/login}" class="add-btn" sec:authorize="isAnonymous()">
+            <i class="fas fa-sign-in-alt"></i> Se connecter pour publier
+        </a>
+        <!-- Shopping Cart Icon - Only for logged-in users -->
+        <div sec:authorize="isAuthenticated()" class="cart-dropdown">
+            <a th:href="@{/panier}" class="cart-btn icon-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <!-- Badge for items in cart -->
+                <span th:if="${cartItemCount != null and cartItemCount > 0}"
+                      class="cart-badge"
+                      th:text="${cartItemCount}">
+            </span>
+            </a>
+        </div>
+        <!-- Dans ta nav, après le bouton "Déposer une annonce" -->
+        <!-- Dans ta nav, après le bouton "Déposer une annonce" -->
+        <div sec:authorize="isAuthenticated()" class="message-dropdown">
+            <button class="message-btn" tabindex="0" id="messageToggle">
+                <i class="fas fa-envelope"></i>
+                <!-- Badge pour messages non lus -->
+                <span th:if="${unreadCount > 0}" class="message-badge" th:text="${unreadCount}"></span>
+            </button>
+            <div class="dropdown-content">
+                <div class="message-dropdown-header">
+                    <i class="fas fa-inbox"></i> Messages récents
+                    <span th:if="${unreadCount > 0}" class="badge" th:text="${unreadCount + ' non lus'}"></span>
+                </div>
+
+                <!-- Liste des messages -->
+                <div th:if="${recentMessages != null and not recentMessages.isEmpty()}" class="message-list">
+                    <div th:each="msg : ${recentMessages}" class="message-item">
+                        <!-- Link to conversation instead of modal -->
+                        <a class="dropdown-item" th:href="@{/messages/conversation/{id}(id=${msg.conversation.id})}">
+                            <div class="message-sender" th:text="${msg.sender.username}"></div>
+                            <div class="message-preview" th:text="${#strings.abbreviate(msg.content, 30)}"></div>
+                            <div class="message-time" th:text="${#temporals.format(msg.sentAt, 'HH:mm')}"></div>
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${recentMessages == null or recentMessages.isEmpty()}" class="no-messages">
+                    <i class="fas fa-inbox"></i> Aucun message
+                </div>
+
+                <a th:href="@{/messages}" class="see-all-messages">
+                    <i class="fas fa-external-link-alt"></i> Voir tous les messages
+                </a>
+            </div>
+        </div>
+        <div class="profile-dropdown">
+            <div sec:authorize="isAuthenticated()" class="dropdown">
+                <button class="profile-btn" tabindex="0">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a th:href="@{/profil}">
+                        <i class="fas fa-user"></i> Mon profil
+                    </a>
+                    <a th:href="@{/mesannonces}">
+                        <i class="fas fa-list"></i> Mes annonces
+                    </a>
+                    <a th:href="@{/favori}">
+                        <i class="fas fa-list"></i> Mes favoris
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="logout-button">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <a sec:authorize="isAnonymous()"
+               th:href="@{/login}" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </a>
+        </div>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Bienvenue sur <span class="highlight">Market</span></h1>
+            <p class="hero-subtitle">La plateforme de petites annonces #1</p>
+            <p class="hero-description">
+                Achetez, vendez, échangez en toute simplicité. Des milliers d'annonces
+                dans toutes les catégories.
+            </p>
+
+            <!-- Stats -->
+            <div class="quick-stats">
+                <div class="stat">
+                    <i class="fas fa-box-open"></i>
+                    <div>
+                        <h3 th:text="${allAnnonces != null ? #lists.size(allAnnonces) : '0'}">0</h3>
+                        <p>Annonces actives</p>
+                    </div>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-tags"></i>
+                    <div>
+                        <h3 th:text="${categories != null ? #sets.size(categories) : '8+'}">8+</h3>
+                        <p>Catégories</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-filter" th:if="${not #sets.isEmpty(categories)}">
+        <h2><i class="fas fa-filter"></i> Catégories</h2>
+        <div class="categories-grid">
+            <a th:each="cat : ${categories}"
+               th:href="@{/(categorie=${cat})}"
+               th:classappend="${selectedCategorie == cat} ? 'active'"
+               class="category-card">
+                <i th:switch="${cat}">
+                    <i th:case="Electronique" class="fas fa-laptop"></i>
+                    <i th:case="Vehicules" class="fas fa-car"></i>
+                    <i th:case="Immobilier" class="fas fa-home"></i>
+                    <i th:case="Maison" class="fas fa-couch"></i>
+                    <i th:case="Mode" class="fas fa-tshirt"></i>
+                    <i th:case="Loisirs" class="fas fa-futbol"></i>
+                    <i th:case="Emploi" class="fas fa-briefcase"></i>
+                    <i th:case="Autre" class="fas fa-ellipsis-h"></i>
+                    <i th:case="*" class="fas fa-tag"></i>
+                </i>
+                <span th:text="${cat}">Catégorie</span>
+            </a>
+            <a th:href="@{/}" th:if="${selectedCategorie}" class="category-card clear-filter">
+                <i class="fas fa-times"></i>
+                <span>Effacer filtre</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Featured Announcements -->
+    <section class="featured-section">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-fire"></i>
+                <span th:if="${selectedCategorie}">Annonces dans <span th:text="${selectedCategorie}"></span></span>
+                <span th:unless="${selectedCategorie}">Annonces récentes</span>
+            </h2>
+            <a th:href="@{/annonces}" class="view-all">Voir toutes <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <!-- Search Results Info -->
+        <div th:if="${search}" class="search-info">
+            <p>Résultats pour: "<strong th:text="${search}"></strong>"
+                <a th:href="@{/}" class="clear-search"><i class="fas fa-times"></i> Effacer</a>
+            </p>
+        </div>
+
+        <!-- Announcements Grid -->
+        <div th:if="${annonces != null and not #lists.isEmpty(annonces)}" class="annonces-grid">
+            <div class="annonce-card" th:each="annonce : ${annonces}">
+                <!-- Add to cart icon -->
+                <div sec:authorize="isAuthenticated()" class="add-to-cart-container">
+                    <form th:if="${annonce.vendeur == null or annonce.vendeur.username != #authentication.name}"
+                          th:action="@{/panier/add/{id}(id=${annonce.id})}"
+                          method="post"
+                          class="add-to-cart-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="add-to-cart-btn" title="Ajouter au panier">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Category Badge -->
+                <div class="category-badge" th:text="${annonce.categorie}">
+                    Catégorie
+                </div>
+
+                <!-- Image -->
+                <div class="annonce-image">
+                    <img th:src="@{'/uploads/' + ${annonce.imagePath}}"
+                         alt="Image annonce"
+                         onerror="this.onerror=null; this.src='/images/default.jpg';">
+                    <div class="image-overlay">
+                        <a th:href="@{/annonces/{id}(id=${annonce.id})}" class="btn-view">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="annonce-content">
+                    <div class="annonce-header">
+                        <h3 class="annonce-title" th:text="${annonce.titre}">Titre</h3>
+                        <div class="price-favorite-container">
+                            <div class="annonce-price">
+                                <span th:text="${#numbers.formatDecimal(annonce.prix, 1, 2) + ' DA'}">0 DA</span>
+                            </div>
+                            <!-- Favorite Heart Icon -->
+                            <div class="favorite-heart-container">
+                                <!-- Si utilisateur connecté -->
+                                <div th:if="${#authorization.expression('isAuthenticated()')}">
+                                    <!-- Formulaire pour SUPPRIMER (si déjà en favoris) - cœur plein -->
+                                    <form th:if="${favoriteAnnonceIds != null and favoriteAnnonceIds.contains(annonce.id)}"
+                                          th:action="@{/favoris/supprimer/{id}(id=${annonce.id})}"
+                                          method="post"
+                                          class="favorite-form">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <button type="submit" class="favorite-btn active" title="Retirer des favoris">
+                                            <i class="fas fa-heart favorite-active"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Formulaire pour AJOUTER (si pas encore en favoris) - cœur vide -->
+                                    <form th:unless="${favoriteAnnonceIds != null and favoriteAnnonceIds.contains(annonce.id)}"
+                                          th:action="@{/favoris/ajouter/{id}(id=${annonce.id})}"
+                                          method="post"
+                                          class="favorite-form">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <button type="submit" class="favorite-btn" title="Ajouter aux favoris">
+                                            <i class="far fa-heart favorite-inactive"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Si utilisateur NON connecté -->
+                                <a th:unless="${#authorization.expression('isAuthenticated()')}"
+                                   th:href="@{/login}"
+                                   class="favorite-btn"
+                                   title="Se connecter pour ajouter aux favoris">
+                                    <i class="far fa-heart favorite-inactive"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="annonce-description"
+                       th:text="${#strings.abbreviate(annonce.description, 100)} ?: 'Pas de description'">
+                        Description...
+                    </p>
+
+                    <!-- Vendeur info -->
+                    <div class="annonce-vendeur" th:if="${annonce.vendeur != null}">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${annonce.vendeur.username}">Vendeur</span>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="annonce-date" th:if="${annonce.createdAt != null}">
+                        <i class="far fa-clock"></i>
+                        <span th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yyyy')}">Date</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <a th:href="@{/annonces/{id}(id=${annonce.id})}" class="btn-details">
+                        <i class="fas fa-info-circle"></i> Voir détails
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(annonces)}" class="empty-state">
+            <i class="fas fa-inbox fa-3x"></i>
+            <h3 th:if="${search != null or selectedCategorie != null}">Aucune annonce trouvée</h3>
+            <h3 th:unless="${search != null or selectedCategorie != null}">Aucune annonce disponible</h3>
+
+            <div class="empty-state-actions">
+                <!-- Different button text based on authentication -->
+                <a th:href="@{/annonces/new}" class="btn-primary" sec:authorize="isAuthenticated()">
+                    <i class="fas fa-plus"></i> Publier une annonce
+                </a>
+                <a th:href="@{/login}" class="btn-primary" sec:authorize="isAnonymous()">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter pour publier
+                </a>
+
+                <a th:href="@{/}" class="btn-secondary"
+                   th:if="${search != null or selectedCategorie != null}">
+                    <i class="fas fa-times"></i> Effacer les filtres
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Prêt à commencer ?</h2>
+            <p>Rejoignez notre communauté de vendeurs et acheteurs</p>
+            <div class="cta-buttons">
+                <!-- If user is authenticated, show "Publier une annonce gratuite" -->
+                <a th:href="@{/annonces/new}" class="btn-cta-primary" sec:authorize="isAuthenticated()">
+                    <i class="fas fa-plus"></i> Publier une annonce gratuite
+                </a>
+
+                <!-- If user is NOT authenticated, show "Se connecter pour publier" -->
+                <a th:href="@{/login}" class="btn-cta-primary" sec:authorize="isAnonymous()">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter pour publier
+                </a>
+
+                <!-- This button is always visible -->
+                <a th:href="@{/annonces}" class="btn-cta-secondary">
+                    <i class="fas fa-search"></i> Explorer toutes les annonces
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3><i class="fas fa-store"></i> Market</h3>
+            <p>La plateforme de petites annonces</p>
+        </div>
+        <div class="footer-section">
+            <h3>Navigation</h3>
+            <ul>
+                <li><a th:href="@{/}">Accueil</a></li>
+                <li><a th:href="@{/annonces}">Toutes les annonces</a></li>
+                <li><a th:href="@{/annonces/new}">Déposer une annonce</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>À propos</h3>
+            <ul>
+                <li><a href="#">Comment ça marche</a></li>
+                <li><a href="#">Conditions d'utilisation</a></li>
+                <li><a href="#">Politique de confidentialité</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 Market. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<script>
+    const toggleBtn = document.getElementById("messageToggle");
+    const dropdown = document.querySelector(".message-dropdown .dropdown-content");
+
+    // Open/close menu
+    toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // prevent closing immediately
+        dropdown.classList.toggle("active");
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
+            dropdown.classList.remove("active");
+        }
+    });
+    const messageToggle = document.getElementById('messageToggle');
+    const messageDropdown = document.querySelector('.message-dropdown');
+
+    messageToggle.addEventListener('click', () => {
+        messageDropdown.classList.toggle('active');
+    });
+
+    // Optional: click outside to close
+    document.addEventListener('click', (e) => {
+        if (!messageDropdown.contains(e.target) && messageDropdown.classList.contains('active')) {
+            messageDropdown.classList.remove('active');
+        }
+    });
+</script>
+
+</body>
+</html>

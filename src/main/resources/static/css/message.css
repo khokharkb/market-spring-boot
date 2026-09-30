@@ -1,0 +1,215 @@
+/* ===== GLOBAL ===== */
+body {
+    background: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+/* ===== VIOLET MARKET NAVBAR ===== */
+.market-navbar {
+    height: 70px;
+    padding: 0 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 6px 25px rgba(0,0,0,.15);
+    z-index: 1000;
+}
+
+/* Brand */
+.market-navbar .navbar-brand {
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.market-navbar .navbar-brand svg {
+    fill: white;
+}
+
+/* Links */
+.market-navbar .nav-link {
+    color: rgba(255,255,255,.85) !important;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.market-navbar .nav-link svg {
+    fill: white;
+}
+
+/* Active link */
+.market-navbar .nav-link.active {
+    color: white !important;
+    position: relative;
+}
+
+.market-navbar .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 3px;
+    background: white;
+}
+
+/* Badge (messages count) */
+.market-navbar .badge {
+    background: #ff4d6d !important;
+}
+
+/* Toggler (mobile) */
+.market-navbar .navbar-toggler {
+    border-color: rgba(255,255,255,.5);
+}
+
+.market-navbar .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* ===== LAYOUT ===== */
+.messages-container {
+    display: flex;
+    height: calc(100vh - 70px);
+    margin-top: 70px;
+}
+
+/* ===== SIDEBAR ===== */
+.conversations-sidebar {
+    width: 350px;
+    background: white;
+    box-shadow: 3px 0 20px rgba(0,0,0,.08);
+    overflow-y: auto;
+}
+
+/* ===== CONVERSATION ITEM ===== */
+.conversation-item {
+    padding: 15px;
+    margin: 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.conversation-item:hover {
+    background: #f5f6ff;
+    transform: translateX(4px);
+}
+
+.conversation-item.active {
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    box-shadow: 0 6px 18px rgba(102,126,234,.35);
+}
+
+/* ===== UNREAD ===== */
+.unread-badge {
+    background: linear-gradient(135deg,#dc3545,#c82333);
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* ===== MESSAGES ===== */
+.messages-content {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+/* ===== MESSAGE BUBBLES ===== */
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    animation: fadeIn .3s ease;
+}
+
+.message-sent {
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    margin-left: auto;
+}
+
+.message-received {
+    background: white;
+    color: #333;
+}
+
+/* ===== ANNONCE PREVIEW ===== */
+.annonce-preview {
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,.08);
+}
+
+.annonce-preview img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Mobile-friendly adjustments */
+.messages-container {
+    display: flex;
+    height: calc(100vh - 70px);
+    margin-top: 70px;
+    flex-wrap: nowrap;
+}
+@media (max-width: 768px) {
+    .messages-container {
+        flex-direction: column; /* stack sidebar & content */
+    }
+
+    .conversations-sidebar {
+        width: 100%; /* full width */
+        max-height: 200px; /* make it collapsible if needed */
+        overflow-x: auto;
+        order: 1; /* show on top */
+    }
+
+    .messages-content {
+        width: 100%;
+        padding: 15px;
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .conversations-sidebar {
+        display: none; /* hidden by default on mobile */
+    }
+
+    .conversations-sidebar.d-none {
+        display: block;
+    }
+}
+@media (max-width: 768px) {
+    form.d-flex {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    form.d-flex input,
+    form.d-flex button {
+        width: 100%;
+    }
+}

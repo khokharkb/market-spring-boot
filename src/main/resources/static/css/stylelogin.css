@@ -1,0 +1,431 @@
+/* login.css - Violet Theme - Responsive Design */
+
+/* 1. Base Styles & Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 2. Main Container */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px; /* Increased for better form width */
+    gap: 40px;
+    padding: 20px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* 3. Header with Title */
+.login-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    gap: 20px;
+}
+
+.login-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #333;
+    line-height: 1.2;
+    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    width: 100%;
+}
+
+/* 4. Messages Container */
+.messages-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-message {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-left: 4px solid #dc3545;
+}
+
+.success-message {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-left: 4px solid #28a745;
+}
+
+/* 5. Login Form Container */
+.login-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+/* 6. Form Elements */
+.form-group {
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    background-color: #fafafa;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+/* 7. Password Container with Toggle */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.toggle-password:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+.eye-icon {
+    font-size: 1.2rem;
+}
+
+/* 8. Submit Button */
+button[type="submit"] {
+    width: 100%;
+    margin-top: 10px;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* 9. Login Footer */
+.login-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.text-center a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+    transition: color 0.3s;
+}
+
+.text-center a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.back-home {
+    margin-top: 15px;
+}
+
+.back-home a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: color 0.3s;
+    padding: 8px 0;
+}
+
+.back-home a:hover {
+    color: #667eea;
+}
+
+.back-home i {
+    font-size: 1.1rem;
+}
+
+/* 10. Desktop Styles (min-width: 768px) */
+@media (min-width: 768px) {
+    .page-wrapper {
+        gap: 50px;
+        padding: 40px 20px;
+    }
+
+    .login-heading {
+        font-size: 3.2rem;
+    }
+
+    .login-container {
+        padding: 40px;
+        max-width: 450px;
+    }
+
+    .message {
+        font-size: 1rem;
+        padding: 14px 20px;
+    }
+}
+
+/* 11. Tablet Styles (min-width: 481px) and (max-width: 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .login-heading {
+        font-size: 2.8rem;
+    }
+
+    .login-container {
+        max-width: 400px;
+        padding: 30px 25px;
+    }
+}
+
+/* 12. Mobile Styles (max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+        align-items: flex-start;
+        min-height: 100vh;
+        height: auto;
+    }
+
+    .page-wrapper {
+        padding: 10px;
+        gap: 30px;
+    }
+
+    .login-heading {
+        font-size: 2.2rem;
+        margin-top: 10px;
+    }
+
+    .login-container {
+        padding: 25px 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+
+    button[type="submit"] {
+        padding: 14px;
+    }
+
+    .message {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+}
+
+/* 13. Small Mobile (max-width: 360px) */
+@media (max-width: 360px) {
+    .login-heading {
+        font-size: 1.9rem;
+    }
+
+    .login-container {
+        padding: 20px 15px;
+    }
+
+    .text-center {
+        font-size: 0.9rem;
+    }
+
+    .back-home a {
+        font-size: 0.85rem;
+    }
+}
+
+/* 14. Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 15. Prevent zoom on iOS */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="password"],
+    textarea {
+        font-size: 16px;
+    }
+}
+
+/* 16. Hide hover effects on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    button[type="submit"]:hover {
+        transform: none;
+    }
+
+    button[type="submit"]:active {
+        opacity: 0.8;
+    }
+}
+
+/* 17. Safe area insets for modern phones */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+        padding-top: max(15px, env(safe-area-inset-top));
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+    }
+}
+
+/* 18. Focus styles for accessibility */
+input[type="text"]:focus-visible,
+input[type="password"]:focus-visible,
+button[type="submit"]:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 19. Loading state for button */
+button[type="submit"].loading {
+    position: relative;
+    color: transparent;
+}
+
+button[type="submit"].loading::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

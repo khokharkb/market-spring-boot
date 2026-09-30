@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Panier | Market</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/panier.css}">
+</head>
+<body>
+
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-store"></i> <span class="brand-text">Market</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" th:href="@{/annonces}">
+                    <i class="fas fa-list"></i> <span class="nav-text">Annonces</span>
+                </a>
+                <a class="nav-link" th:href="@{/}">
+                    <i class="fas fa-home"></i> <span class="nav-text">Accueil</span>
+                </a>
+                <a class="nav-link" th:href="@{/panier}">
+                    <i class="fas fa-shopping-cart"></i> <span class="nav-text">Panier</span>
+                    <span th:if="${cartItemCount != null and cartItemCount > 0}"
+                          class="badge bg-danger rounded-pill cart-badge">
+                        <span th:text="${cartItemCount}">0</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h1 class="mb-4 page-title">
+        <i class="fas fa-shopping-cart"></i> Mon Panier
+    </h1>
+
+    <!-- Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Panier vide -->
+    <div th:if="${panierItems == null or panierItems.isEmpty()}" class="empty-cart text-center py-5">
+        <div class="empty-cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h3 class="mb-3">Votre panier est vide</h3>
+        <p class="text-muted mb-4">Ajoutez des articles à votre panier pour continuer</p>
+        <a th:href="@{/annonces}" class="btn btn-primary btn-lg btn-continue">
+            <i class="fas fa-list"></i> Voir les annonces
+        </a>
+    </div>
+
+    <!-- Panier non vide -->
+    <div th:if="${panierItems != null and !panierItems.isEmpty()}" class="cart-content">
+        <!-- Mobile Card View -->
+        <div class="cart-items-mobile d-block d-lg-none">
+            <div th:each="item : ${panierItems}" class="cart-item-card">
+                <div class="card-item-header">
+                    <img th:src="${item.annonce.imagePath != null ? '/uploads/' + item.annonce.imagePath : '/images/default.jpg'}"
+                         alt="Image annonce"
+                         class="item-image"
+                         onerror="this.onerror=null; this.src='/images/default.jpg';">
+                    <div class="item-info">
+                        <h5 th:text="${item.annonce.titre}"></h5>
+                        <p class="text-muted item-description"
+                           th:text="${#strings.abbreviate(item.annonce.description, 80)}"></p>
+                    </div>
+                </div>
+
+                <div class="card-item-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Prix unitaire:</span>
+                        <span class="detail-value" th:text="${#numbers.formatDecimal(item.annonce.prix, 1, 2) + ' DA'}"></span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Quantité:</span>
+                        <div class="quantity-controls">
+                            <!-- Bouton - -->
+                            <form th:action="@{/panier/retirer/{id}(id=${item.annonce.id})}"
+                                  method="post"
+                                  class="d-inline">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn minus">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </form>
+
+                            <!-- Quantité -->
+                            <span class="quantity-display" th:text="${item.quantite}"></span>
+
+                            <!-- Bouton + -->
+                            <form th:action="@{/panier/add/{id}(id=${item.annonce.id})}"
+                                  method="post"
+                                  class="d-inline">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn plus">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value total-price"
+                              th:text="${#numbers.formatDecimal(item.annonce.prix * item.quantite, 1, 2) + ' DA'}"></span>
+                    </div>
+                </div>
+
+                <div class="card-item-actions">
+                    <form th:action="@{/panier/supprimer/{id}(id=${item.annonce.id})}"
+                          method="post"
+                          class="w-100">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-danger btn-sm btn-remove"
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="cart-items-desktop d-none d-lg-block">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Image</th>
+                        <th>Annonce</th>
+                        <th>Prix unitaire</th>
+                        <th>Quantité</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${panierItems}">
+                        <td data-label="Image">
+                            <img th:src="${item.annonce.imagePath != null ? '/uploads/' + item.annonce.imagePath : '/images/default.jpg'}"
+                                 alt="Image annonce"
+                                 class="table-image"
+                                 onerror="this.onerror=null; this.src='/images/default.jpg';">
+                        </td>
+                        <td data-label="Annonce">
+                            <strong th:text="${item.annonce.titre}"></strong><br>
+                            <small class="text-muted"
+                                   th:text="${#strings.abbreviate(item.annonce.description, 50)}"></small>
+                        </td>
+                        <td data-label="Prix unitaire">
+                            <span th:text="${#numbers.formatDecimal(item.annonce.prix, 1, 2) + ' DA'}"></span>
+                        </td>
+                        <td data-label="Quantité">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <!-- Bouton - -->
+                                <form th:action="@{/panier/retirer/{id}(id=${item.annonce.id})}"
+                                      method="post"
+                                      class="d-inline me-2">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Quantité -->
+                                <span class="mx-2 quantity-display" th:text="${item.quantite}"></span>
+
+                                <!-- Bouton + -->
+                                <form th:action="@{/panier/add/{id}(id=${item.annonce.id})}"
+                                      method="post"
+                                      class="d-inline ms-2">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        <td data-label="Total" th:text="${#numbers.formatDecimal(item.annonce.prix * item.quantite, 1, 2) + ' DA'}"></td>
+                        <td data-label="Actions">
+                            <form th:action="@{/panier/supprimer/{id}(id=${item.annonce.id})}"
+                                  method="post"
+                                  class="d-inline">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-danger btn-remove"
+                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Total Section -->
+        <div class="cart-total-section">
+            <div class="total-card">
+                <div class="total-header">
+                    <h4><i class="fas fa-receipt"></i> Récapitulatif</h4>
+                </div>
+                <div class="total-body">
+                    <div class="total-row">
+                        <span class="total-label">Total général:</span>
+                        <span class="total-value" th:text="${#numbers.formatDecimal(total, 1, 2) + ' DA'}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="cart-actions">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <a th:href="@{/annonces}" class="btn btn-outline-primary btn-block btn-action">
+                            <i class="fas fa-arrow-left"></i> <span>Continuer les achats</span>
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <form th:action="@{/panier/vider}" method="post" class="d-grid">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-outline-danger btn-action"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir vider tout le panier ?');">
+                                <i class="fas fa-trash-alt"></i> <span>Vider le panier</span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a th:href="@{/commande}" class="btn btn-success btn-lg btn-block btn-action btn-order">
+                            <i class="fas fa-credit-card"></i> <span>Commander</span>
+                            <small class="order-total">(<span th:text="${#numbers.formatDecimal(total, 1, 2)}"></span> DA)</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-5 py-4 bg-light">
+    <div class="container text-center">
+        <p class="mb-0">
+            <i class="fas fa-store"></i> Market &copy; 2025 - Plateforme de petites annonces
+        </p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script pour les animations -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation pour les alertes
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+
+        // Animation pour les cartes mobile
+        const cartItems = document.querySelectorAll('.cart-item-card');
+        cartItems.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Optimisation pour mobile: agrandir les zones cliquables
+        const buttons = document.querySelectorAll('button, .btn, a.btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            btn.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    });
+
+    // Gestion de la visibilité du texte dans le navbar sur mobile
+    function updateNavbarVisibility() {
+        const navTexts = document.querySelectorAll('.nav-text');
+        const brandText = document.querySelector('.brand-text');
+
+        if (window.innerWidth <= 576) {
+            navTexts.forEach(text => text.style.display = 'none');
+            if (brandText) brandText.style.display = 'none';
+        } else {
+            navTexts.forEach(text => text.style.display = 'inline');
+            if (brandText) brandText.style.display = 'inline';
+        }
+    }
+
+    // Exécuter au chargement et au redimensionnement
+    window.addEventListener('load', updateNavbarVisibility);
+    window.addEventListener('resize', updateNavbarVisibility);
+</script>
+</body>
+</html>

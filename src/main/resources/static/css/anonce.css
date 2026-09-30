@@ -1,0 +1,731 @@
+/* annonces.css - Styles pour la page des annonces */
+
+/* ===== GLOBAL STYLES ===== */
+body {
+    background: #f8f9fa;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* ===== NAVBAR ===== */
+.custom-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white !important;
+}
+
+.navbar-brand i {
+    margin-right: 10px;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    margin: 0 5px;
+    padding: 8px 16px !important;
+    border-radius: 25px;
+    transition: all 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+.btn-add-annonce {
+    background:  linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 25px;
+    padding: 8px 20px !important;
+    color: white !important;
+}
+
+.btn-add-annonce:hover {
+    background:  linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: translateY(-2px);
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-title i {
+    color: #667eea;
+    margin-right: 15px;
+}
+
+.page-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== SEARCH & FILTER ===== */
+.search-form .input-group {
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-input, .category-select {
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+}
+
+.search-input:focus, .category-select:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.search-input {
+    border-right: 1px solid #eee;
+}
+
+.btn-search {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-weight: 600;
+}
+
+.btn-search:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+}
+
+/* ===== ALERTS ===== */
+.custom-alert {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+/* ===== STATS ===== */
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s;
+    height: 100%;
+    margin-bottom: 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    font-size: 2.2rem;
+    color: #667eea;
+    margin-right: 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.stat-card h3 {
+    color: #333;
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.stat-card p {
+    color: #666;
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+}
+
+/* ===== ANNONCE CARDS ===== */
+.annonce-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+}
+
+.annonce-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Category Badge */
+.category-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+/* Image Container */
+.image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.annonce-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.annonce-card:hover .annonce-image {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.annonce-card:hover .image-overlay {
+    opacity: 1;
+}
+
+.btn-view {
+    background: white;
+    color: #333;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-view:hover {
+    background: #667eea;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Annonce Content */
+.annonce-content {
+    padding: 1.25rem;
+}
+
+.annonce-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.annonce-title {
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
+    flex: 1;
+    line-height: 1.4;
+}
+
+.annonce-price {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 70px;
+    text-align: center;
+}
+
+.annonce-description {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Vendeur Info */
+.vendeur-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.vendeur-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.vendeur-details strong {
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.vendeur-details small {
+    font-size: 0.8rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.btn-details {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-details:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.owner-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+    transform: rotate(15deg);
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+    transform: rotate(15deg);
+}
+
+/* ===== NO ANNONCES ===== */
+.no-annonces {
+    background: white;
+    padding: 3rem 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+}
+
+.no-annonces i {
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.no-annonces h3 {
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    border: none;
+    margin: 0 4px;
+    border-radius: 8px !important;
+    color: #666;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.page-link:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: #333;
+    color: white;
+    padding: 2rem 0 1rem;
+    margin-top: 3rem;
+}
+
+.footer h5 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.footer p {
+    color: #aaa;
+    line-height: 1.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+    }
+
+    .search-form .input-group {
+        flex-direction: column;
+        border-radius: 12px;
+    }
+
+    .search-input, .category-select, .btn-search {
+        width: 100%;
+        border-radius: 8px !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-input {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+    }
+
+    .annonce-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-link {
+        text-align: center;
+        margin: 0.25rem 0;
+    }
+}
+
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.annonce-card {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+/* Delay for each card */
+.annonces-grid .col-md-6:nth-child(2) .annonce-card {
+    animation-delay: 0.1s;
+}
+
+.annonces-grid .col-md-6:nth-child(3) .annonce-card {
+    animation-delay: 0.2s;
+}
+
+.annonces-grid .col-md-6:nth-child(4) .annonce-card {
+    animation-delay: 0.3s;
+}
+ .action-buttons {
+     display: flex;
+     gap: 8px;
+     margin-top: 15px;
+     flex-wrap: wrap;
+ }
+
+/* Bouton Détails - icône bleue */
+.btn-details {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.btn-details:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+/* Bouton Modifier - icône jaune */
+.btn-edit {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+    color: #000;
+}
+
+/* Bouton Supprimer - icône rouge */
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* Assurer que les boutons soient alignés */
+.action-buttons form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+/* Carte annonce */
+.annonce-card {
+    position: relative;
+}
+
+/* Bouton panier */
+.add-to-cart-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ffffff;
+    color: #2c3e50;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 18px;
+    transition: all 0.25s ease;
+    z-index: 20;
+    text-decoration: none;
+}
+
+/* Hover */
+.add-to-cart-btn:hover {
+    background: #667eea; /* Bootstrap success */
+    color: #fff;
+    transform: scale(1.1);
+}
+/* Dans votre fichier CSS */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    min-width: 150px;
+}
+
+.stat-item i {
+    color: #667eea;
+}
+
+.annonce-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    margin-top: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+/* Ajoutez ce CSS dans votre fichier anonce.css */
+
+/* Bouton favori */
+.favorite-btn {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.favorite-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.favorite-btn.active,
+.favorite-btn .fas {
+    color: #ff4757;
+}
+
+/* Animation du cœur */
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.favorite-btn.active i,
+.favorite-btn .fas {
+    animation: heartBeat 0.5s ease;
+}
+
+/* Conteneur des actions rapides */
+.quick-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+}
+
+/* Positionnement des badges */
+.category-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #764ba2;
+    z-index: 20;
+}
+
+/* Adaptation du bouton panier existant */
+.add-to-cart-container {
+    position: relative;
+    display: inline-block;
+}
+
+.add-to-cart-btn {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.add-to-cart-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    color: #764ba2;
+}

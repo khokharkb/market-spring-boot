@@ -1,0 +1,463 @@
+/* register.css - Violet Theme matching Annonces page */
+
+/* 1. General body styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #f8f9fa; /* Light background like annonces page */
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 2. Layout wrapper */
+.page-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    gap: 60px;
+}
+
+/* 3. Left side: Title and description */
+.register-left {
+    flex: 1;
+}
+
+.register-heading {
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #333;
+    line-height: 1.2;
+    margin-bottom: 15px;
+}
+
+.register-heading span {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.register-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-top: 10px;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+/* 4. Right side: Registration form */
+.register-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.25);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.register-header h2 {
+    color: #333;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* 5. Logo Market */
+.register-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: #667eea;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* 6. Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    background-color: #fafafa;
+    font-size: 1rem;
+    color: #333;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+input::placeholder {
+    color: #999;
+    font-size: 0.95rem;
+}
+
+/* 7. Password container with visibility toggle */
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px;
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: #764ba2;
+}
+
+/* 8. Submit button */
+button[type="submit"] {
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+button[type="submit"] i {
+    font-size: 1.1rem;
+}
+
+/* 9. Error/Success messages */
+.message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-message {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-left: 4px solid #dc3545;
+}
+
+.success-message {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-left: 4px solid #28a745;
+}
+
+/* 10. Terms and conditions */
+.terms {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.terms input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.terms label {
+    font-weight: 500;
+    display: inline;
+    margin-left: 5px;
+}
+
+.terms a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+/* 11. Login link */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.login-link a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* 12. Back to home */
+.back-home {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.back-home a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: color 0.3s;
+}
+
+.back-home a:hover {
+    color: #667eea;
+}
+
+/* 13. Responsive design */
+@media (max-width: 900px) {
+    .page-wrapper {
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .register-heading {
+        font-size: 2.5rem;
+        text-align: center;
+    }
+
+    .register-subtitle {
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .register-container {
+        max-width: 400px;
+        padding: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .register-heading {
+        font-size: 2rem;
+    }
+
+    .register-container {
+        padding: 25px 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 12px 14px;
+    }
+
+    button[type="submit"] {
+        padding: 12px 14px;
+    }
+}
+
+/* 14. Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.error-message {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* 15. Form validation styling */
+input.is-invalid {
+    border-color: #dc3545;
+}
+
+input.is-valid {
+    border-color: #28a745;
+}
+
+.password-strength {
+    margin-top: 5px;
+    font-size: 0.85rem;
+}
+
+.password-strength.weak {
+    color: #dc3545;
+}
+
+.password-strength.medium {
+    color: #ffc107;
+}
+
+.password-strength.strong {
+    color: #28a745;
+}
+
+/* 16. Field requirements */
+.requirements {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+    padding-left: 15px;
+}
+
+.requirements li {
+    margin-bottom: 3px;
+}
+
+.requirements li.valid {
+    color: #28a745;
+}
+
+.requirements li.invalid {
+    color: #dc3545;
+}
+
+/* 17. Loading state */
+button.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    position: relative;
+}
+
+button.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@media (max-width: 600px) {
+
+    body {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .page-wrapper {
+        width: 100%;
+        padding: 20px;
+        gap: 25px;
+    }
+
+    .register-left {
+        display: none; /* hide text on phone */
+    }
+
+    .register-container {
+        max-width: 100%;
+        padding: 28px 22px;
+        border-radius: 14px;
+    }
+
+    .register-header h2 {
+        font-size: 1.6rem;
+    }
+
+    input {
+        padding: 13px 14px;
+        font-size: 0.95rem;
+    }
+
+    button[type="submit"] {
+        padding: 13px;
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${annonce.titre} + ' | Market'">Détails de l'annonce</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/detail.css}">
+    <style>
+        /* Styles pour les étoiles */
+        .star-rating-display {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+        .star-rating-empty {
+            color: #e0e0e0;
+        }
+        .rating-form-stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .rating-form-stars .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+        .rating-form-stars .star:hover,
+        .rating-form-stars .star.active {
+            color: #ffc107;
+        }
+        .rating-form-stars .star.selected {
+            color: #ffc107;
+        }
+        .rating-message {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+    <!-- Stocker la note utilisateur pour JavaScript -->
+    <input type="hidden" id="currentUserRating" th:value="${userRating != null ? userRating : ''}">
+</head>
+<body>
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-store"></i> Market
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" th:href="@{/annonces}">
+                <i class="fas fa-list"></i> Annonces
+            </a>
+            <a class="nav-link" href="/" th:href="@{/}">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4 mb-5">
+    <!-- Bouton retour -->
+    <a th:href="@{/annonces}" class="btn btn-outline-secondary mb-4">
+        <i class="fas fa-arrow-left"></i> Retour aux annonces
+    </a>
+
+    <!-- Messages d'erreur/succès -->
+    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <!-- Colonne gauche: Image et description -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Image -->
+                    <div class="text-center mb-4">
+                        <img th:src="@{/uploads/{filename}(filename=${annonce.imagePath})}"
+                             class="annonce-image"
+                             alt="Image de l'annonce"
+                             onerror="this.onerror=null; this.src='/images/default.jpg';">
+                    </div>
+
+                    <!-- Titre et prix -->
+                    <div class="annonce-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h1 class="mb-2" th:text="${annonce.titre}">Titre</h1>
+                                <div class="badge bg-primary" th:text="${annonce.categorie}">Catégorie</div>
+                            </div>
+                            <div class="annonce-price" th:text="${#numbers.formatDecimal(annonce.prix, 1, 2) + ' dz'}">
+                                0.00 dz
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description complète -->
+                    <div class="mb-5">
+                        <h3><i class="fas fa-align-left"></i> Description</h3>
+                        <p class="lead" th:text="${annonce.description}">Description complète...</p>
+                    </div>
+
+                    <!-- Section de notation -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4><i class="fas fa-star text-warning"></i> Évaluation</h4>
+
+                            <!-- Affichage de la note moyenne -->
+                            <div th:if="${averageRating > 0}" class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="star-rating-display me-3">
+                    <span th:each="i: ${#numbers.sequence(1, 5)}">
+                        <i th:class="${i <= averageRating ? 'fas fa-star' :
+                                      (i - 0.5 <= averageRating ? 'fas fa-star-half-alt' : 'far fa-star star-rating-empty')}"></i>
+                    </span>
+                                    </div>
+                                    <div>
+                                        <strong th:text="${#numbers.formatDecimal(averageRating, 1, 1)} + '/5'">0.0/5</strong>
+                                        <span class="text-muted ms-2" th:text="'(' + ${totalRatings} + ' avis)'">(0 avis)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Message si pas encore de note -->
+                            <div th:if="${averageRating == 0}" class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="star-rating-display me-3">
+                                        <i class="far fa-star star-rating-empty"></i>
+                                        <i class="far fa-star star-rating-empty"></i>
+                                        <i class="far fa-star star-rating-empty"></i>
+                                        <i class="far fa-star star-rating-empty"></i>
+                                        <i class="far fa-star star-rating-empty"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Aucune évaluation</strong>
+                                        <span class="text-muted ms-2" th:text="'(' + ${totalRatings} + ' avis)'">(0 avis)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Formulaire de notation - Afficher différemment si déjà noté -->
+                            <div class="mt-4">
+                                <div th:if="${hasRated}">
+                                    <h5>Votre avis</h5>
+                                    <div class="alert alert-info">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <strong>Vous avez déjà noté cette annonce :</strong>
+                                            </div>
+                                            <div class="star-rating-display">
+                            <span th:each="i: ${#numbers.sequence(1, 5)}">
+                                <i th:class="${i <= userRating ? 'fas fa-star text-warning' : 'far fa-star star-rating-empty'}"></i>
+                            </span>
+                                                <span class="ms-2" th:text="'(' + ${userRating} + '/5)'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:unless="${hasRated}">
+                                    <h5>Donner votre avis</h5>
+                                    <form th:action="@{/annonces/{id}/rate(id=${annonce.id})}" method="post" id="ratingForm">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Votre note</label>
+                                            <div class="rating-form-stars" id="starRating">
+                                                <span class="star" data-value="1">☆</span>
+                                                <span class="star" data-value="2">☆</span>
+                                                <span class="star" data-value="3">☆</span>
+                                                <span class="star" data-value="4">☆</span>
+                                                <span class="star" data-value="5">☆</span>
+                                            </div>
+                                            <input type="hidden" name="stars" id="selectedRating" value="" required>
+                                            <div class="rating-message" id="ratingText">Sélectionnez une note (1-5 étoiles)</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Votre commentaire (optionnel)</label>
+                                            <textarea class="form-control" name="comment" rows="3"
+                                                      placeholder="Partagez votre expérience avec ce produit..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Soumettre l'avis
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations supplémentaires -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar"></i> Date de publication</h5>
+                            <p th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yyyy à HH:mm')}">Date</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-eye"></i> Statistiques</h5>
+                            <div class="statistics-box">
+                                <div class="stat-item">
+                                    <i class="fas fa-eye text-primary"></i>
+                                    <span class="stat-label">Vues :</span>
+                                    <span class="stat-value" th:text="${annonce.views}">0</span>
+                                </div>
+                                <div class="stat-item mt-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span class="stat-label">Avis :</span>
+                                    <span class="stat-value" th:text="${totalRatings != null ? totalRatings : 0}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action (pour le propriétaire) -->
+                    <div th:if="${isOwner != null and isOwner}" class="action-buttons mt-4 pt-3 border-top">
+                        <a th:href="@{/annonces/{id}/edit(id=${annonce.id})}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier cette annonce
+                        </a>
+                        <form th:action="@{/annonces/{id}/delete(id=${annonce.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');">
+                                <i class="fas fa-trash"></i> Supprimer cette annonce
+                            </button>
+                        </form>
+                    </div>
+
+
+                    <!-- Bouton d'action pour l'admin -->
+                    <div th:if="${isAdmin != null and isAdmin and (isOwner == null or not isOwner)}" class="action-buttons mt-4 pt-3 border-top">
+                        <form th:action="@{/annonces/{id}/delete(id=${annonce.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');">
+                                <i class="fas fa-trash"></i> Supprimer cette annonce (Admin)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne droite: Carte vendeur et informations -->
+        <div class="col-lg-4">
+            <!-- Carte vendeur -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="fas fa-user"></i> Vendeur</h3>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                             style="width: 60px; height: 60px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 th:text="${annonce.vendeur?.username ?: 'Anonyme'}">Anonyme</h5>
+                            <p class="text-muted mb-0">Membre depuis 2025</p>
+                        </div>
+                    </div>
+
+                    <!-- Informations de contact -->
+                    <div class="mb-3">
+                        <div class="contact-info mb-2">
+                            <i class="fas fa-phone text-primary me-2"></i>
+                            <span th:text="${annonce.telephone ?: 'Non renseigné'}">Non renseigné</span>
+                        </div>
+                        <p><i class="fas fa-box-open"></i>
+                            <span th:text="${vendeurAnnoncesCount != null ? vendeurAnnoncesCount : 0}">0</span> annonces
+                        </p>
+                        <p><i class="fas fa-star text-warning"></i>
+                            <span th:text="${vendeurTotalRatings != null ? vendeurTotalRatings : 0}">0</span> avis
+                        </p>
+                    </div>
+
+                    <!-- Bouton contacter -->
+                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        <i class="fas fa-envelope"></i> Contacter le vendeur
+                    </button>
+                </div>
+            </div>
+
+            <!-- Informations de sécurité -->
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-shield-alt"></i> Conseils de sécurité</h5>
+                    <ul class="small">
+                        <li>Rencontrez le vendeur dans un lieu public</li>
+                        <li>Vérifiez l'article avant d'acheter</li>
+                        <li>Ne payez jamais à l'avance</li>
+                        <li>Signalez tout comportement suspect</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour contacter le vendeur -->
+<div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contacter le vendeur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/annonce/{id}/contact(id=${annonce.id})}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Votre message</label>
+                        <textarea class="form-control" name="message" rows="4"
+                                  placeholder="Bonjour, je suis intéressé par votre annonce..."
+                                  required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Envoyer le message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-5 py-4 bg-dark text-white">
+    <div class="container text-center">
+        <p>&copy; 2025 Market. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Système d'étoiles interactif
+        const stars = document.querySelectorAll('.rating-form-stars .star');
+        const selectedRatingInput = document.getElementById('selectedRating');
+        const ratingText = document.getElementById('ratingText');
+
+        const ratingMessages = {
+            '1': 'Mauvais - 1 étoile',
+            '2': 'Passable - 2 étoiles',
+            '3': 'Moyen - 3 étoiles',
+            '4': 'Bon - 4 étoiles',
+            '5': 'Excellent - 5 étoiles'
+        };
+
+        if (stars.length > 0) {
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+
+                    // Mettre à jour l'input caché
+                    selectedRatingInput.value = value;
+
+                    // Mettre à jour l'affichage des étoiles
+                    stars.forEach((s, index) => {
+                        if (index < value) {
+                            s.textContent = '★';
+                            s.classList.add('selected');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('selected');
+                        }
+                    });
+
+                    // Mettre à jour le texte
+                    ratingText.textContent = ratingMessages[value] || "Note sélectionnée";
+                    ratingText.style.color = '#333';
+                    ratingText.style.fontStyle = 'normal';
+                });
+
+                // Effet au survol
+                star.addEventListener('mouseover', function() {
+                    const value = this.getAttribute('data-value');
+                    stars.forEach((s, index) => {
+                        if (index < value) {
+                            s.textContent = '★';
+                            s.classList.add('active');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+
+                // Effet quand la souris quitte
+                star.addEventListener('mouseout', function() {
+                    const currentValue = selectedRatingInput.value;
+                    if (!currentValue) {
+                        stars.forEach(s => {
+                            s.textContent = '☆';
+                            s.classList.remove('selected', 'active');
+                        });
+                        ratingText.textContent = "Sélectionnez une note (1-5 étoiles)";
+                        ratingText.style.color = '#666';
+                        ratingText.style.fontStyle = 'italic';
+                    } else {
+                        stars.forEach((s, index) => {
+                            if (index < currentValue) {
+                                s.textContent = '★';
+                                s.classList.add('selected');
+                                s.classList.remove('active');
+                            } else {
+                                s.textContent = '☆';
+                                s.classList.remove('selected', 'active');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Validation du formulaire
+            const ratingForm = document.getElementById('ratingForm');
+            if (ratingForm) {
+                ratingForm.addEventListener('submit', function(e) {
+                    if (!selectedRatingInput.value) {
+                        e.preventDefault();
+                        alert('Veuillez sélectionner une note avant de soumettre.');
+                        return false;
+                    }
+                    return true;
+                });
+            }
+        }
+
+        // Affiche un message de succès si présent
+        const successMessage = document.querySelector('.alert-success');
+        if (successMessage) {
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+    });
+    // Pré-remplir les étoiles si l'utilisateur a déjà noté
+    const currentUserRating = document.getElementById('currentUserRating').value;
+    if (currentUserRating && currentUserRating !== '') {
+        const star = document.querySelector(`.star[data-value="${currentUserRating}"]`);
+        if (star) {
+            star.click();
+            // Désactiver le formulaire si vous le souhaitez
+            // document.getElementById('ratingForm').querySelectorAll('input, textarea, button').forEach(el => el.disabled = true);
+        }
+    }
+</script>
+
+<!-- Modal de succès (optionnel) -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><i class="fas fa-check-circle text-success me-2"></i>
+                    <span th:if="${success != null}" th:text="${success}">Message envoyé avec succès</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

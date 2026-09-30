@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" type="text/css" href="/css/stylelogin.css" />
+</head>
+<body>
+<div class="page-wrapper">
+    <!-- Header with title at the top -->
+    <div class="login-header-wrapper">
+        <h1 class="login-heading">Se connecter</h1>
+
+        <!-- Messages displayed below the title -->
+        <div class="messages-container">
+            <div th:if="${param.error}">
+                <p class="message error-message">Email ou mot de passe incorrect.</p>
+            </div>
+
+            <div th:if="${param.logout}">
+                <p class="message success-message">Vous êtes déconnecté.</p>
+            </div>
+
+            <div th:if="${param.registered}">
+                <p class="message success-message">Inscription réussie. Connectez-vous.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login form below the title -->
+    <div class="login-container">
+        <form th:action="@{/login}" method="post">
+            <!-- Ajout du token CSRF -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur ou email</label>
+                <input type="text" id="username" name="username" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" />
+                    <button type="button" class="toggle-password" aria-label="Afficher le mot de passe">
+                        <i class="eye-icon">👁️</i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit">Se connecter</button>
+        </form>
+
+        <div class="login-footer">
+            <p class="text-center">
+                Pas encore de compte ?
+                <a th:href="@{/register}" class="text-decoration-none fw-bold">S'inscrire</a>
+            </p>
+
+            <div class="back-home">
+                <a th:href="@{/}" class="text-decoration-none">
+                    <i>←</i> Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('.toggle-password');
+        const passwordInput = document.querySelector('#password');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // Change icon
+                const eyeIcon = this.querySelector('.eye-icon');
+                if (type === 'text') {
+                    eyeIcon.textContent = '🙈';
+                } else {
+                    eyeIcon.textContent = '👁️';
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Inscription | Market</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styleregister.css}">
+</head>
+<body>
+<div class="register-container">
+    <!-- Header -->
+    <div class="register-header">
+        <h1><i class="fas fa-user-plus"></i> Créer un compte</h1>
+        <p>Rejoignez Market et commencez à vendre vos articles</p>
+    </div>
+
+    <!-- Messages d'erreur/succès -->
+    <div class="px-4 pt-3">
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="register-form">
+        <form th:action="@{/register}" th:object="${registrationRequest}" method="post" id="registerForm">
+            <!-- Informations personnelles -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="prenom" class="form-label">Prénom *</label>
+                    <input type="text" id="prenom" th:field="*{prenom}" class="form-control"
+                           placeholder="Votre prénom" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('prenom')}"
+                         th:errors="*{prenom}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nom" class="form-label">Nom *</label>
+                    <input type="text" id="nom" th:field="*{nom}" class="form-control"
+                           placeholder="Votre nom" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('nom')}"
+                         th:errors="*{nom}"></div>
+                </div>
+            </div>
+
+            <!-- Informations de connexion -->
+            <div class="form-group mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" id="username" th:field="*{username}" class="form-control"
+                           placeholder="Choisissez un nom d'utilisateur" required>
+                </div>
+                <div class="form-text">Entre 3 et 50 caractères</div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('username')}"
+                     th:errors="*{username}"></div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email" class="form-label">Email *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <input type="email" id="email" th:field="*{email}" class="form-control"
+                           placeholder="votre@email.com" required>
+                </div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('email')}"
+                     th:errors="*{email}"></div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="password" class="form-label">Mot de passe *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" id="password" th:field="*{password}" class="form-control"
+                           placeholder="Au moins 6 caractères" required>
+                    <button type="button" class="btn btn-outline-secondary toggle-password"
+                            style="border-left: none; border-color: #e0e0e0;" data-target="#password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('password')}"
+                     th:errors="*{password}"></div>
+            </div>
+
+            <!-- Informations de contact -->
+            <div class="form-group mb-3">
+                <label for="telephone" class="form-label">Téléphone *</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-phone"></i>
+                    </span>
+                    <input type="tel" id="telephone" th:field="*{telephone}" class="form-control"
+                           placeholder="Ex: 0770123456" required>
+                </div>
+                <div class="form-text">Numéro algérien (ex: 0550123456, 0770123456)</div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('telephone')}"
+                     th:errors="*{telephone}"></div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="adresse" class="form-label">Adresse</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    <input type="text" id="adresse" th:field="*{adresse}" class="form-control"
+                           placeholder="Votre adresse complète">
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="ville" class="form-label">Ville</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-city"></i>
+                    </span>
+                    <input type="text" id="ville" th:field="*{ville}" class="form-control"
+                           placeholder="Votre ville de résidence">
+                </div>
+            </div>
+
+            <!-- Bouton d'inscription -->
+            <button type="submit" class="btn btn-register" id="submitBtn">
+                <i class="fas fa-user-plus"></i> S'inscrire
+            </button>
+        </form>
+
+        <p class="login-link mt-4">
+            Déjà inscrit ?
+            <a th:href="@{/login}">Se connecter</a>
+        </p>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Validation JavaScript améliorée -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.querySelector(targetId);
+                const icon = this.querySelector('i');
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Validation du téléphone
+        const phoneInput = document.getElementById('telephone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                // Garder seulement les chiffres
+                let value = this.value.replace(/\D/g, '');
+
+                // Ajouter le préfixe pour l'Algérie
+                if (value.length > 0) {
+                    if (value.startsWith('0')) {
+                        this.value = value.substring(0, 10); // Limite à 10 chiffres
+                    } else if (value.startsWith('213')) {
+                        this.value = '+213 ' + value.substring(3, 12);
+                    } else {
+                        this.value = '0' + value.substring(0, 9);
+                    }
+                }
+            });
+
+            // Validation en temps réel
+            phoneInput.addEventListener('blur', function() {
+                const phoneRegex = /^(0|\+213)[567]\d{8}$/;
+                if (this.value && !phoneRegex.test(this.value.replace(/\s/g, ''))) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
+
+        // Validation du formulaire avec feedback visuel
+        const form = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+
+                // Validation du téléphone
+                const phoneRegex = /^(0|\+213)[567]\d{8}$/;
+                if (phoneInput && !phoneRegex.test(phoneInput.value.replace(/\s/g, ''))) {
+                    alert('Veuillez entrer un numéro de téléphone algérien valide (ex: 0770123456)');
+                    phoneInput.focus();
+                    phoneInput.classList.add('is-invalid');
+                    valid = false;
+                }
+
+                // Validation de base des champs requis
+                const requiredFields = form.querySelectorAll('[required]');
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        valid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (valid) {
+                    // Désactiver le bouton pendant l'envoi
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('loading');
+                    submitBtn.innerHTML = '';
+                } else {
+                    e.preventDefault();
+                }
+            });
+
+            // Supprimer l'état d'erreur quand l'utilisateur commence à taper
+            form.addEventListener('input', function(e) {
+                if (e.target.hasAttribute('required') && e.target.value.trim()) {
+                    e.target.classList.remove('is-invalid');
+                }
+            });
+        }
+
+        // Animation pour les champs
+        const formControls = document.querySelectorAll('.form-control');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+
+            control.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+
+        // Support du clavier virtuel sur mobile
+        window.addEventListener('resize', function() {
+            // Ajuster la position du formulaire quand le clavier apparaît
+            if (window.innerHeight < 500) {
+                document.body.style.paddingTop = '10px';
+                document.body.style.alignItems = 'flex-start';
+            } else {
+                document.body.style.paddingTop = '';
+                document.body.style.alignItems = 'center';
+            }
+        });
+    });
+
+    // Détecter les changements d'orientation
+    window.addEventListener('orientationchange', function() {
+        // Rafraîchir après le changement d'orientation
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 100);
+    });
+</script>
+</body>
+</html>

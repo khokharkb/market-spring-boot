@@ -1,0 +1,461 @@
+/* admin.css - Custom Simple Admin Theme (Matches Annonces Page) */
+:root {
+    /* === Color Palette from annonces.css === */
+    --primary-light: #667eea;    /* Light purple/blue from gradient */
+    --primary-dark: #764ba2;     /* Dark purple from gradient */
+    --secondary-color: #28a745;  /* Green for success/active states */
+    --bg-dark: #333;             /* Dark background (matches footer) */
+    --bg-light: #f8f9fa;         /* Main page background */
+    --card-bg: #ffffff;          /* Card background */
+    --text-dark: #333;           /* Main text color */
+    --text-light: #666;          /* Muted text */
+    --border-color: #dee2e6;     /* Light borders */
+    --success-color: #28a745;    /* Green (matches btn-add-annonce) */
+    --warning-color: #ffc107;    /* Amber/Yellow (matches edit button) */
+    --danger-color: #dc3545;     /* Red (matches delete button) */
+
+    /* === Spacing & Sizing === */
+    --sidebar-width: 260px;
+    --border-radius: 12px;       /* Matches annonces.css radius */
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    --transition: all 0.3s ease;
+}
+
+/* === Base & Layout === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* === Sidebar (Matches Navbar Gradient) === */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Matches navbar shadow */
+}
+
+.sidebar-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.sidebar-nav a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateX(5px);
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: rgba(220, 53, 69, 0.15); /* Danger color with opacity */
+    color: #f8d7da;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 25px; /* Matches annonces.css rounded buttons */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background: rgba(220, 53, 69, 0.25);
+    transform: translateY(-2px);
+}
+
+/* === Main Content === */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+}
+
+.admin-header {
+    margin-bottom: 2.5rem;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.admin-header h1 {
+    font-size: 2rem;
+    color: var(--text-dark);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.admin-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* === Stats Cards (Matches annonces.css stat-card) === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-light);
+    font-size: 1.8rem;
+    background: rgba(102, 126, 234, 0.1); /* Matches annonces.css */
+}
+
+.stat-info h3 {
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+}
+
+.stat-info p {
+    color: var(--text-light);
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+}
+
+/* === Sections Headers === */
+.users-section h2,
+.recent-section h2,
+.actions-section h2 {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* === Tables (Simpler Design) === */
+.table-container {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table thead {
+    background: #f1f5f9;
+}
+
+.admin-table th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    color: var(--text-dark);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.admin-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.03);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* === Form Elements in Table === */
+.role-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: white;
+    color: var(--text-dark);
+    cursor: pointer;
+    min-width: 110px;
+    transition: var(--transition);
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+}
+
+.btn-status {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 25px; /* Matches rounded buttons */
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+    min-width: 90px;
+}
+
+.btn-status.active {
+    background: var(--success-color);
+}
+
+.btn-status.inactive {
+    background: var(--danger-color);
+}
+
+.btn-status:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    transition: var(--transition);
+}
+
+.btn-action.delete {
+    background-color: var(--danger-color);
+}
+
+.btn-action.delete:hover {
+    background-color: #c82333;
+    transform: rotate(15deg); /* Matches annonces.css delete button effect */
+}
+
+/* === Quick Actions === */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.action-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-decoration: none;
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.action-card:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    color: white;
+    transform: translateY(-5px);
+    border-color: var(--primary-light);
+}
+
+.action-card i {
+    margin-bottom: 1rem;
+    color: var(--primary-light);
+    font-size: 2.2rem;
+}
+
+.action-card:hover i {
+    color: white;
+}
+
+.action-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.action-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.action-card:hover p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* === Alerts (Matches annonces.css alert style) === */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .admin-container {
+        flex-direction: column;
+    }
+
+    .stats-grid,
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .admin-table {
+        min-width: 800px;
+    }
+
+    .admin-header {
+        padding: 1.5rem;
+    }
+}
+
+/* Card animation from annonces.css */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card,
+.action-card {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.2s; }
+.actions-grid .action-card:nth-child(2) { animation-delay: 0.1s; }

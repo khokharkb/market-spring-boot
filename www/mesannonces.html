@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Annonces | Market</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/mannonces.css}">
+</head>
+<body>
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-store"></i> Market
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="#" th:href="@{/annonces}">
+                <i class="fas fa-list"></i> Toutes les annonces
+            </a>
+            <a class="nav-link active" href="/" th:href="@{/}">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+            <a class="nav-link btn-add-annonce" th:href="@{/annonces/new}">
+                <i class="fas fa-plus-circle"></i> Ajouter une annonce
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="page-header mb-5">
+        <h1 class="page-title">
+            <i class="fas fa-user-circle"></i> Mes Annonces
+        </h1>
+        <p class="page-subtitle">Gérez toutes vos annonces publiées sur Market</p>
+
+        <!-- Stats -->
+        <!-- Modifier la section des stats -->
+        <div class="stats-card">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <h2><i class="fas fa-box-open"></i></h2>
+                    <h3 th:text="${totalAnnonces}">0</h3>
+                    <p>Annonces publiées</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h2><i class="fas fa-eye"></i></h2>
+                    <h3 th:text="${totalViews}">0</h3>
+                    <p>Vues totales</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h2><i class="fas fa-comments"></i></h2>
+                    <h3 th:text="${totalMessages}">0</h3>
+                    <p>Messages reçus</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dans chaque carte d'annonce, ajouter -->
+        <div class="annonce-stats">
+            <small><i class="fas fa-eye"></i> <span th:text="${annonce.viewCount}">0</span> vues</small>
+            <small><i class="fas fa-calendar ms-3"></i>
+                <span th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yy')}">Date</span>
+            </small>
+        </div>
+
+        <!-- Actions Rapides -->
+        <div class="d-flex gap-3 mb-4">
+            <a th:href="@{/annonces/new}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Publier une nouvelle annonce
+            </a>
+            <a th:href="@{/annonces}" class="btn btn-outline-primary">
+                <i class="fas fa-search"></i> Explorer toutes les annonces
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages d'alerte -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show custom-alert" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Mes Annonces Grid -->
+    <div th:if="${#lists.isEmpty(annonces)}" class="no-annonces text-center py-5">
+        <i class="fas fa-inbox fa-4x mb-3"></i>
+        <h3>Vous n'avez publié aucune annonce</h3>
+        <p class="text-muted">Commencez par publier votre première annonce !</p>
+        <a th:href="@{/annonces/new}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus"></i> Publier ma première annonce
+        </a>
+    </div>
+
+    <div class="row annonces-grid">
+        <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4" th:each="annonce : ${annonces}">
+            <div class="annonce-card">
+                <!-- Badge catégorie -->
+                <div class="category-badge" th:text="${annonce.categorie}">
+                    Catégorie
+                </div>
+
+                <!-- Image avec overlay -->
+                <!-- Image avec overlay - CORRIGÉ -->
+                <div class="image-container">
+                    <img th:src="@{'/uploads/' + ${annonce.imagePath}}"
+                         class="annonce-image"
+                         alt="Image annonce"
+                         onerror="this.onerror=null; this.src='/images/default.jpg';">
+                    <div class="image-overlay">
+                        <a th:href="@{/annonces/{id}(id=${annonce.id})}" class="btn btn-view">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="annonce-content">
+                    <div class="annonce-header">
+                        <h5 class="annonce-title" th:text="${annonce.titre}">Titre</h5>
+                        <div class="annonce-price" th:text="${#numbers.formatDecimal(annonce.prix, 1, 2) + ' dz'}">
+                            dz0.00
+                        </div>
+                    </div>
+
+                    <p class="annonce-description" th:text="${#strings.abbreviate(annonce.description, 100)}">
+                        Description...
+                    </p>
+
+                    <!-- Vendeur info -->
+                    <div class="vendeur-info">
+                        <div class="vendeur-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="vendeur-details">
+                            <strong th:text="${annonce.vendeur?.username ?: 'Anonyme'}">
+                                Anonyme
+                            </strong>
+                            <small class="text-muted d-block"
+                                   th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yyyy')}">
+                                Date
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a th:href="@{/annonces/{id}(id=${annonce.id})}"
+                           class="btn btn-details"
+                           title="Voir détails">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+
+                        <!-- Bouton Modifier -->
+                        <a th:href="@{/annonces/{id}/edit(id=${annonce.id})}"
+                           class="btn btn-edit"
+                           title="Modifier cette annonce">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        <!-- Bouton Supprimer -->
+                        <form th:action="@{/annonces/{id}/delete(id=${annonce.id})}"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');">
+                            <button type="submit"
+                                    class="btn btn-delete"
+                                    title="Supprimer cette annonce">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information sur le statut -->
+    <div th:if="${not #lists.isEmpty(annonces)}" class="mt-5 p-4 bg-light rounded">
+        <h5><i class="fas fa-info-circle"></i> Informations</h5>
+        <p class="mb-0">
+            Vous avez publié <strong th:text="${totalAnnonces}"></strong> annonce(s).
+            Vous pouvez modifier ou supprimer vos annonces à tout moment.
+        </p>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5><i class="fas fa-store"></i> Market</h5>
+                <p>La plateforme de petites annonces préférée des Français.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p>&copy; 2025 Market. Tous droits réservés.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Animation pour les cartes
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.annonce-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+</body>
+</html>

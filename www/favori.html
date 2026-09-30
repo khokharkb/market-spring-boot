@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Favoris - Market</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+<!-- Même HEADER que home.html -->
+<header>
+    <div class="logo">
+        <h2><i class="fas fa-store"></i> Market</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <form th:action="@{/}" method="get">
+            <input type="text" name="search" placeholder="Rechercher des annonces..." class="search-bar">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <nav class="nav-container">
+        <a th:href="@{/annonces/new}" class="add-btn" sec:authorize="isAuthenticated()">
+            <i class="fas fa-plus-circle"></i> Déposer une annonce
+        </a>
+        <a th:href="@{/login}" class="add-btn" sec:authorize="isAnonymous()">
+            <i class="fas fa-sign-in-alt"></i> Se connecter pour publier
+        </a>
+
+        <div sec:authorize="isAuthenticated()" class="cart-dropdown">
+            <a th:href="@{/panier}" class="cart-btn icon-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <span th:if="${cartItemCount != null and cartItemCount > 0}"
+                      class="cart-badge"
+                      th:text="${cartItemCount}">
+                </span>
+            </a>
+        </div>
+
+        <div sec:authorize="isAuthenticated()" class="message-dropdown">
+            <button class="message-btn" tabindex="0" id="messageToggle">
+                <i class="fas fa-envelope"></i>
+                <span th:if="${unreadCount > 0}" class="message-badge" th:text="${unreadCount}"></span>
+            </button>
+            <div class="dropdown-content">
+                <!-- Contenu identique à home.html -->
+            </div>
+        </div>
+
+        <div class="profile-dropdown">
+            <div sec:authorize="isAuthenticated()" class="dropdown">
+                <button class="profile-btn" tabindex="0">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a th:href="@{/profil}">
+                        <i class="fas fa-user"></i> Mon profil
+                    </a>
+                    <a th:href="@{/mesannonces}">
+                        <i class="fas fa-list"></i> Mes annonces
+                    </a>
+                    <a th:href="@{/favori}">
+                        <i class="fas fa-heart"></i> Mes favoris
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="logout-button">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </a>
+        </div>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main>
+    <!-- Hero Section pour favoris -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Mes <span class="highlight">Favoris</span></h1>
+            <p class="hero-subtitle">Toutes vos annonces sauvegardées</p>
+
+            <!-- Stats -->
+            <div class="quick-stats">
+                <div class="stat">
+                    <i class="fas fa-heart"></i>
+                    <div>
+                        <h3 th:text="${favoris != null ? #lists.size(favoris) : '0'}">0</h3>
+                        <p>Annonces favorites</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Favorites List -->
+    <section class="featured-section">
+        <div class="section-header">
+            <h2><i class="fas fa-heart"></i> Vos annonces favorites</h2>
+            <a th:href="@{/annonces}" class="view-all">Voir toutes les annonces <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <!-- Favorites Grid -->
+        <div th:if="${favoris != null and not #lists.isEmpty(favoris)}" class="annonces-grid">
+            <div class="annonce-card" th:each="favori : ${favoris}">
+                <!-- Add to cart icon -->
+                <div sec:authorize="isAuthenticated()" class="add-to-cart-container">
+                    <form th:if="${favori.annonce.vendeur == null or favori.annonce.vendeur.username != currentUsername}"
+                          th:action="@{/panier/add/{id}(id=${favori.annonce.id})}"
+                          method="post"
+                          class="add-to-cart-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="add-to-cart-btn" title="Ajouter au panier">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Category Badge -->
+                <div class="category-badge" th:text="${favori.annonce.categorie}">
+                    Catégorie
+                </div>
+
+                <!-- Image -->
+                <div class="annonce-image">
+                    <img th:src="@{'/uploads/' + ${favori.annonce.imagePath}}"
+                         alt="Image annonce"
+                         onerror="this.onerror=null; this.src='/images/default.jpg';">
+                    <div class="image-overlay">
+                        <a th:href="@{/annonces/{id}(id=${favori.annonce.id})}" class="btn-view">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="annonce-content">
+                    <div class="annonce-header">
+                        <h3 class="annonce-title" th:text="${favori.annonce.titre}">Titre</h3>
+                        <div class="price-favorite-container">
+                            <div class="annonce-price">
+                                <span th:text="${#numbers.formatDecimal(favori.annonce.prix, 1, 2) + ' DA'}">0 DA</span>
+                            </div>
+                            <!-- Favorite Heart Icon - Already in favorites -->
+                            <div class="favorite-heart-container">
+                                <form th:action="@{/favori/toggle/{id}(id=${favori.annonce.id})}"
+                                      method="post"
+                                      class="favorite-form">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="favorite-btn" title="Retirer des favoris">
+                                        <i class="fas fa-heart favorite-active"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="annonce-description"
+                       th:text="${#strings.abbreviate(favori.annonce.description, 100)} ?: 'Pas de description'">
+                        Description...
+                    </p>
+
+                    <!-- Vendeur info -->
+                    <div class="annonce-vendeur" th:if="${favori.annonce.vendeur != null}">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${favori.annonce.vendeur.username}">Vendeur</span>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="annonce-date" th:if="${favori.annonce.createdAt != null}">
+                        <i class="far fa-clock"></i>
+                        <span th:text="${#temporals.format(favori.annonce.createdAt, 'dd/MM/yyyy')}">Date</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <a th:href="@{/annonces/{id}(id=${favori.annonce.id})}" class="btn-details">
+                        <i class="fas fa-info-circle"></i> Voir détails
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${favoris == null or #lists.isEmpty(favoris)}" class="empty-state">
+            <i class="fas fa-heart fa-3x"></i>
+            <h3>Vous n'avez pas encore d'annonces favorites</h3>
+            <p>Ajoutez des annonces à vos favoris en cliquant sur l'icône ♥</p>
+            <div class="empty-state-actions">
+                <a th:href="@{/}" class="btn-primary">
+                    <i class="fas fa-search"></i> Explorer les annonces
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER (identique à home.html) -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3><i class="fas fa-store"></i> Market</h3>
+            <p>La plateforme de petites annonces</p>
+        </div>
+        <div class="footer-section">
+            <h3>Navigation</h3>
+            <ul>
+                <li><a th:href="@{/}">Accueil</a></li>
+                <li><a th:href="@{/annonces}">Toutes les annonces</a></li>
+                <li><a th:href="@{/annonces/new}">Déposer une annonce</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>À propos</h3>
+            <ul>
+                <li><a href="#">Comment ça marche</a></li>
+                <li><a href="#">Conditions d'utilisation</a></li>
+                <li><a href="#">Politique de confidentialité</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 Market. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<script>
+    // JavaScript pour le dropdown des messages (identique à home.html)
+    const toggleBtn = document.getElementById("messageToggle");
+    const dropdown = document.querySelector(".message-dropdown .dropdown-content");
+
+    if (toggleBtn && dropdown) {
+        toggleBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle("active");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
+                dropdown.classList.remove("active");
+            }
+        });
+    }
+</script>
+</body>
+</html>
