@@ -1,6 +1,7 @@
 package org.example.market.annonce;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.rating.Rating;
 import org.example.market.rating.RatingRepository;
 import org.example.market.user.User;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AnnonceService {
 
@@ -30,9 +32,7 @@ public class AnnonceService {
         return repo.countByVendeurUsername(username);
     }
     public List<Annonce> findAll() {
-        List<Annonce> list = repo.findAll();
-        System.out.println("---- DEBUG annonces: " + list.size());
-        return list;
+        return repo.findAll();
     }
 
     public Annonce findById(Long id) {
@@ -43,7 +43,7 @@ public class AnnonceService {
     public Annonce save(Annonce a) {
         return repo.save(a);
     }
-    // MÉTHODE POUR METTRE À JOUR UNE ANNONCE
+
     public Annonce update(Long id, Annonce annonceDetails) {
         Annonce existingAnnonce = findById(id);
 
@@ -52,13 +52,15 @@ public class AnnonceService {
         existingAnnonce.setPrix(annonceDetails.getPrix());
         existingAnnonce.setCategorie(annonceDetails.getCategorie());
 
-        // Garder l'image existante si aucune nouvelle image n'est fournie
+        // On garde l'image existante si aucune nouvelle image n'est fournie
         if (annonceDetails.getImagePath() != null && !annonceDetails.getImagePath().isEmpty()) {
             existingAnnonce.setImagePath(annonceDetails.getImagePath());
         }
 
         return repo.save(existingAnnonce);
     }
+
+    /** Le propriétaire de l'annonce ou un admin peut la supprimer. */
     public boolean canDelete(Annonce annonce) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
@@ -72,17 +74,16 @@ public class AnnonceService {
 
         return isAdmin || isOwner;
     }
-    // MÉTHODE POUR VÉRIFIER SI L'UTILISATEUR PEUT SUPPRIMER (version avec ID)
+
     public boolean canDelete(Long annonceId) {
         Annonce annonce = findById(annonceId);
         return canDelete(annonce);
     }
-    // MÉTHODE POUR SUPPRIMER UNE ANNONCE
+
     @Transactional
     public void delete(Long id) {
         Annonce annonce = findById(id);
 
-        // Vérifier si l'utilisateur a le droit de supprimer
         if (!canDelete(annonce)) {
             throw new org.springframework.security.access.AccessDeniedException(
                     "Vous n'avez pas le droit de supprimer cette annonce"
@@ -92,42 +93,38 @@ public class AnnonceService {
         repo.deleteById(id);
     }
 
-    // MÉTHODE POUR VÉRIFIER SI L'UTILISateur EST LE PROPRIÉTAIRE
     public boolean isOwner(Long annonceId, String username) {
         Optional<Annonce> annonceOpt = repo.findById(annonceId);
         return annonceOpt.isPresent() && annonceOpt.get().isOwner(username);
     }
-    // MÉTHODE POUR TROUVER LES ANNONCES D'UN UTILISATEUR
+
     public List<Annonce> findByVendeurUsername(String username) {
         return repo.findByVendeurUsername(username);
     }
-    // Dans AnnonceService.java
+
     public long count() {
         return repo.count();
     }
 
+    /** Supprime toutes les annonces d'un utilisateur (avant de supprimer son compte). */
     public void deleteByUserId(Long userId) {
-        // Implémentez cette méthode pour supprimer toutes les annonces d'un utilisateur
-        // Par exemple :
         List<Annonce> annonces = repo.findByVendeurId(userId);
         repo.deleteAll(annonces);
     }
-    // Méthode pour compter toutes les annonces
+
     public long countAll() {
         return repo.count();
     }
 
-    // Méthode pour compter les vendeurs distincts
     public long countVendeursDistinct() {
         return repo.countDistinctVendeurs();
     }
 
-    // Méthode pour récupérer toutes les catégories
     public List<String> findAllCategories() {
         return repo.findAllDistinctCategories();
     }
 
-    // Méthode pour rechercher des annonces avec filtres (optionnel)
+    /** Recherche par titre et/ou catégorie ; sans filtre, renvoie toutes les annonces. */
     public List<Annonce> searchAnnonces(String search, String category) {
         if (search != null && !search.isEmpty() && category != null && !category.isEmpty()) {
             return repo.findByTitreContainingIgnoreCaseAndCategorie(search, category);
@@ -139,34 +136,30 @@ public class AnnonceService {
             return repo.findAll();
         }
     }
-    // Méthode pour incrémenter les vues
+
     @Transactional
     public void incrementViews(Long annonceId) {
         Annonce annonce = repo.findById(annonceId)
                 .orElseThrow(() -> new RuntimeException("Annonce non trouvée"));
 
         annonce.incrementViews();
-       repo.save(annonce);
+        repo.save(annonce);
     }
 
-    // Méthode pour récupérer une annonce avec incrémentation des vues
+    /** Récupère une annonce et compte une vue de plus. */
     @Transactional
     public Annonce findByIdAndIncrementViews(Long id) {
         Annonce annonce = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Annonce non trouvée"));
 
-        // Incrémenter les vues
         annonce.incrementViews();
         return repo.save(annonce);
     }
-    // Méthode pour compter les annonces d'un vendeur
+
     public Long countByVendeurId(Long vendeurId) {
         return repo.countByVendeurId(vendeurId);
-        // OU si vous utilisez la query personnalisée :
-        // return annonceRepository.countAnnoncesByVendeurId(vendeurId);
     }
 
-    // Autres méthodes utiles pour les statistiques
     public Long countTotalAnnonces() {
         return repo.count();
     }
@@ -183,10 +176,7 @@ public class AnnonceService {
             throw new RuntimeException("Vous ne pouvez pas noter votre propre annonce");
         }
 
-        // Ajouter la note
         annonce.addRating(userId, stars);
-
-        // Sauvegarder
         return repo.save(annonce);
     }
 
@@ -210,54 +200,37 @@ public class AnnonceService {
     public boolean canUserRate(Long annonceId, Long userId) {
         Annonce annonce = findById(annonceId);
 
-        // Vérifier que l'utilisateur n'est pas le propriétaire
-        if (annonce.getVendeur() != null && annonce.getVendeur().getId().equals(userId)) {
-            return false;
-        }
-
-        // Pour l'instant, on autorise tous les utilisateurs connectés
-        // (on pourrait ajouter d'autres vérifications plus tard)
-        return true;
+        // Le vendeur ne peut pas noter sa propre annonce
+        return annonce.getVendeur() == null || !annonce.getVendeur().getId().equals(userId);
     }
 
     /**
-     * Supprime la note d'un utilisateur pour une annonce
-     * @param annonceId ID de l'annonce
-     * @param userId ID de l'utilisateur
-
-    public void removeRating(Long annonceId, Long userId) {
-        Annonce annonce = findById(annonceId);
-        annonce.removeRating(userId);
-        repo.save(annonce);
-    } */
+     * Ajoute une note avec commentaire, ou met à jour la note existante de l'utilisateur.
+     * @return false si l'enregistrement a échoué
+     */
     public boolean rateAnnonce(Long annonceId, Long userId, Integer stars, String comment) {
         try {
-            // Récupérer l'annonce
             Annonce annonce = repo.findById(annonceId)
                     .orElseThrow(() -> new RuntimeException("Annonce non trouvée"));
 
-            // Récupérer l'utilisateur
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-            // Vérifier si la note existe déjà
             Optional<Rating> existingRating = ratingRepository.findByAnnonceIdAndUserId(annonceId, userId);
 
             if (existingRating.isPresent()) {
-                // Mettre à jour la note existante
                 Rating rating = existingRating.get();
                 rating.setStars(stars);
                 rating.setComment(comment);
                 ratingRepository.save(rating);
                 return true;
             } else {
-                // Créer une nouvelle note
                 Rating rating = new Rating(annonce, user, stars, comment);
                 ratingRepository.save(rating);
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Échec de l'enregistrement de la note (annonce {}, utilisateur {})", annonceId, userId, e);
             return false;
         }
     }
@@ -267,7 +240,7 @@ public class AnnonceService {
             ratingRepository.deleteByAnnonceIdAndUserId(annonceId, userId);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Échec de la suppression de la note (annonce {}, utilisateur {})", annonceId, userId, e);
             return false;
         }
     }

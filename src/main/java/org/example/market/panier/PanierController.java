@@ -1,8 +1,9 @@
 package org.example.market.panier;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.user.User;
-import org.example.market.user.UserRepository; // Ajoutez cette importation
+import org.example.market.user.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/panier")
 @RequiredArgsConstructor
@@ -18,13 +20,11 @@ import java.util.List;
 public class PanierController {
 
     private final PanierService panierService;
-    private final UserRepository userRepository; // Ajoutez ceci
-
+    private final UserRepository userRepository;
 
     // Afficher le panier de l'utilisateur connecté
     @GetMapping
     public String afficherPanier(Model model, Authentication authentication) {
-        // Récupérer l'ID de l'utilisateur connecté
         Long userId = getCurrentUserId(authentication);
 
         List<Panier> panierItems = panierService.getPanierUtilisateur(userId);
@@ -47,7 +47,7 @@ public class PanierController {
             panierService.ajouterAuPanier(userId, annonceId);
             redirectAttributes.addFlashAttribute("success", "Article ajouté au panier !");
         } catch (Exception e) {
-            e.printStackTrace(); // Pour le débogage
+            log.error("Échec de l'ajout au panier (annonce {})", annonceId, e);
             redirectAttributes.addFlashAttribute("error", "Erreur lors de l'ajout au panier: " + e.getMessage());
         }
 
@@ -110,7 +110,6 @@ public class PanierController {
         }
         String username = authentication.getName();
 
-        // Cherchez l'utilisateur par son nom d'utilisateur
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le nom: " + username));
 

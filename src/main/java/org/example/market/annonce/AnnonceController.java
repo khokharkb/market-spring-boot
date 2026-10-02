@@ -2,6 +2,7 @@ package org.example.market.annonce;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.favoris.FavoriService;
 import org.example.market.message.MessageService;
 import org.example.market.panier.PanierService;
@@ -30,12 +31,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @CrossOrigin(origins = {"http://localhost:3000", "capacitor://localhost", "http://localhost"})
 public class AnnonceController {
 
     private final AnnonceService annonceService;
-    private final PanierService panierService; // Ajouter ceci
+    private final PanierService panierService;
     private final AnnonceRepository annonceRepository;
     private final UserRepository userRepository;
     private final Path rootLocation = Paths.get("uploads");
@@ -58,14 +60,13 @@ public class AnnonceController {
 
         try {
             Files.createDirectories(rootLocation);
-            System.out.println("✅ Dossier uploads créé: " + rootLocation.toAbsolutePath());
+            log.info("Dossier des images : {}", rootLocation.toAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize storage!", e);
         }
     }
 
-    // === AFFICHER LA LISTE DES ANNONCES ===
-    // === AFFICHER LA LISTE DES ANNONCES ===
+    // Liste des annonces, avec recherche et filtre par catégorie
     @GetMapping("/annonces")
     public String getAnnonces(
             @RequestParam(required = false) String search,
@@ -74,8 +75,7 @@ public class AnnonceController {
         List<Annonce> annonces = annonceService.findAll();
         model.addAttribute("annonces", annonces);
 
-
-        // 2. Filtrer par recherche si paramètre existe
+        // Filtrer par recherche
         if (search != null && !search.trim().isEmpty()) {
             final String searchLower = search.toLowerCase();
             annonces = annonces.stream()
@@ -86,7 +86,7 @@ public class AnnonceController {
                     .collect(Collectors.toList());
         }
 
-        // 3. Filtrer par catégorie si paramètre existe
+        // Filtrer par catégorie
         if (category != null && !category.trim().isEmpty()) {
             annonces = annonces.stream()
                     .filter(a -> category.equals(a.getCategorie()))
@@ -95,37 +95,33 @@ public class AnnonceController {
 
         model.addAttribute("annonces", annonces);
 
-        // 4. Ajouter les paramètres pour pré-remplir le formulaire
+        // Pour pré-remplir le formulaire de recherche
         model.addAttribute("search", search);
         model.addAttribute("category", category);
 
-
-        // Ajouter l'username courant pour vérifier la propriété dans le template
+        // Le template a besoin de l'utilisateur courant pour afficher les boutons du propriétaire
         if (userDetails != null) {
             String username = userDetails.getUsername();
             model.addAttribute("currentUsername", username);
 
-            // Vérifier si l'utilisateur est admin
             boolean isAdmin = userDetails.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             model.addAttribute("isAdmin", isAdmin);
 
-            // Récupérer l'utilisateur complet depuis la base de données
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Récupérer les IDs des annonces favorites de cet utilisateur
+            // IDs des favoris, pour afficher les cœurs remplis
             List<Long> favorisIds = favoriService.getFavorisByUser(user).stream()
                     .map(favori -> favori.getAnnonce().getId())
                     .collect(Collectors.toList());
 
             model.addAttribute("favorisIds", favorisIds);
         } else {
-            // Si l'utilisateur n'est pas connecté, passer une liste vide
             model.addAttribute("favorisIds", new ArrayList<Long>());
         }
 
-        // Statistiques supplémentaires (optionnel)
+        // Statistiques affichées en haut de la page
         long totalAnnonces = annonceService.countAll();
         long vendeursCount = annonceService.countVendeursDistinct();
         List<String> categories = annonceService.findAllCategories();
@@ -136,14 +132,15 @@ public class AnnonceController {
 
         return "annonces";
     }
-    // === FORMULAIRE POUR AJOUTER UNE ANNONCE ===
+
+    // Formulaire de création d'une annonce
     @GetMapping("/annonces/new")
     public String showCreateForm(Model model) {
         model.addAttribute("annonce", new Annonce());
         return "annonce-form";
     }
 
-    // === SAUVEGARDER UNE NOUVELLE ANNONCE ===
+    // Enregistrement d'une nouvelle annonce
     @PostMapping("/annonces")
     public String saveAnnonce(@ModelAttribute Annonce annonce,
                               @RequestParam("imageFile") MultipartFile imageFile,
@@ -170,7 +167,7 @@ public class AnnonceController {
                 annonce.setImagePath(filename);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Échec de la sauvegarde de l'image", e);
                 throw new RuntimeException("Échec de la sauvegarde de l'image: " + e.getMessage());
             }
         } else {
@@ -181,13 +178,13 @@ public class AnnonceController {
         return "redirect:/annonces";
     }
 
-    // === FORMULAIRE DE MODIFICATION ===
+    // Formulaire de modification
     @GetMapping("/annonces/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model,
                                @AuthenticationPrincipal UserDetails userDetails,
                                RedirectAttributes redirectAttributes) {
 
-        // Vérifier que l'utilisateur est le propriétaire (admin NE peut PAS modifier les annonces des autres)
+        // Seul le propriétaire peut modifier (pas l'admin)
         if (!annonceService.isOwner(id, userDetails.getUsername())) {
             redirectAttributes.addFlashAttribute("error", "❌ Vous n'êtes pas autorisé à modifier cette annonce");
             return "redirect:/annonces";
@@ -200,7 +197,7 @@ public class AnnonceController {
         return "annonce-form";
     }
 
-    // === METTRE À JOUR UNE ANNONCE ===
+    // Mise à jour d'une annonce
     @PostMapping("/annonces/{id}/edit")
     public String updateAnnonce(@PathVariable Long id,
                                 @ModelAttribute Annonce annonceDetails,
@@ -208,7 +205,6 @@ public class AnnonceController {
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
 
-        // Vérifier que l'utilisateur est le propriétaire (admin NE peut PAS modifier les annonces des autres)
         if (!annonceService.isOwner(id, userDetails.getUsername())) {
             redirectAttributes.addFlashAttribute("error", "❌ Vous n'êtes pas autorisé à modifier cette annonce");
             return "redirect:/annonces";
@@ -216,7 +212,7 @@ public class AnnonceController {
 
         Annonce existingAnnonce = annonceService.findById(id);
 
-        // Gérer la nouvelle image si fournie
+        // Nouvelle image si une a été envoyée, sinon on garde l'ancienne
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
                 String originalFilename = imageFile.getOriginalFilename();
@@ -233,29 +229,27 @@ public class AnnonceController {
                 annonceDetails.setImagePath(filename);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Échec de l'upload de l'image", e);
                 redirectAttributes.addFlashAttribute("error", "Erreur lors du upload de l'image");
                 return "redirect:/annonces/" + id + "/edit";
             }
         } else {
-            // Garder l'image existante
             annonceDetails.setImagePath(existingAnnonce.getImagePath());
         }
 
-        // Mettre à jour l'annonce
         annonceService.update(id, annonceDetails);
         redirectAttributes.addFlashAttribute("success", "✅ Annonce modifiée avec succès");
 
         return "redirect:/annonces";
     }
 
-    // === SUPPRIMER UNE ANNONCE ===
+    // Suppression d'une annonce
     @PostMapping("/annonces/{id}/delete")
     public String deleteAnnonce(@PathVariable Long id,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
 
-        // Vérifier que l'utilisateur a le droit de supprimer (propriétaire OU admin)
+        // Le propriétaire ou un admin peut supprimer
         if (!annonceService.canDelete(id)) {
             redirectAttributes.addFlashAttribute("error", "❌ Vous n'êtes pas autorisé à supprimer cette annonce");
             return "redirect:/annonces";
@@ -271,13 +265,17 @@ public class AnnonceController {
         return "redirect:/annonces";
     }
 
-
-    // SERVIR LES IMAGES
+    // Images des annonces
     @GetMapping("/uploads/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         try {
-            Path file = rootLocation.resolve(filename);
+            Path root = rootLocation.toAbsolutePath().normalize();
+            Path file = root.resolve(filename).normalize();
+            // Refuse les chemins qui sortent du dossier uploads (ex : "../")
+            if (!file.startsWith(root)) {
+                return ResponseEntity.notFound().build();
+            }
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -291,7 +289,8 @@ public class AnnonceController {
             return ResponseEntity.notFound().build();
         }
     }
-    // === MES ANNONCES (annonces de l'utilisateur connecté) ===
+
+    // Annonces de l'utilisateur connecté
     @GetMapping("/mesannonces")
     public String mesAnnonces(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
@@ -301,27 +300,21 @@ public class AnnonceController {
         String username = userDetails.getUsername();
         List<Annonce> mesAnnonces = annonceService.findByVendeurUsername(username);
 
-        // Récupérer l'utilisateur complet depuis la base de données
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Récupérer les IDs des annonces favorites de cet utilisateur
         List<Long> favorisIds = favoriService.getFavorisByUser(user).stream()
                 .map(favori -> favori.getAnnonce().getId())
                 .collect(Collectors.toList());
 
-        // ✅ AJOUTEZ CES ATTRIBUTS MANQUANTS :
         model.addAttribute("annonces", mesAnnonces);
         model.addAttribute("currentUsername", username);
         model.addAttribute("pageTitle", "Mes annonces");
         model.addAttribute("totalAnnonces", mesAnnonces.size());
-        model.addAttribute("favorisIds", favorisIds);  // Important pour les cœurs
+        model.addAttribute("favorisIds", favorisIds);
+        // TODO : compter les vrais messages reçus
+        model.addAttribute("totalMessages", 0);
 
-        // ✅ AJOUTEZ CES ATTRIBUTS POUR LES STATISTIQUES :
-        // model.addAttribute("totalViews", calculateTotalViews(mesAnnonces));  // Nouvelle méthode
-        model.addAttribute("totalMessages", 0);  // À implémenter plus tard
-
-        // ✅ Ajoutez aussi isAdmin si vous l'utilisez
         boolean isAdmin = userDetails.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         model.addAttribute("isAdmin", isAdmin);
@@ -338,8 +331,9 @@ public class AnnonceController {
 
         messageService.sendMessage(id, message, principal.getName());
         redirectAttributes.addFlashAttribute("success", "Message sent to seller!");
-        return "redirect:/annonces/" + id;  // ❌ ERREUR : devrait être "annonces"
+        return "redirect:/annonces/" + id;
     }
+
     @GetMapping("/annonces/{id}")
     public String viewAnnonce(@PathVariable Long id,
                               Model model,
@@ -347,14 +341,13 @@ public class AnnonceController {
                               @AuthenticationPrincipal UserDetails userDetails,
                               HttpServletRequest request) {
 
-        // 1. Récupérer l'annonce avec incrémentation des vues
+        // Chaque visite incrémente le compteur de vues
         Annonce annonce = annonceService.findByIdAndIncrementViews(id);
 
-        // 2. Récupérer les statistiques de notation depuis le service
         Double averageRating = annonceService.getAverageRating(id);
         Integer totalRatings = annonceService.getTotalRatings(id);
 
-        // 3. Initialiser les champs de l'annonce si null (pour compatibilité)
+        // Les anciennes annonces peuvent avoir ces champs à null
         if (annonce.getAverageRating() == null) {
             annonce.setAverageRating(averageRating != null ? averageRating : 0.0);
         }
@@ -362,16 +355,13 @@ public class AnnonceController {
             annonce.setRatingCount(totalRatings != null ? totalRatings : 0);
         }
 
-        // 4. Ajouter les attributs au modèle
         model.addAttribute("annonce", annonce);
         model.addAttribute("averageRating", averageRating != null ? averageRating : 0.0);
         model.addAttribute("totalRatings", totalRatings != null ? totalRatings : 0);
 
-        // 5. Récupérer toutes les notes pour cette annonce
         List<Rating> ratings = ratingRepository.findByAnnonceId(id);
         model.addAttribute("ratings", ratings);
 
-        // 6. Gestion utilisateur connecté
         if (userDetails != null) {
             String username = userDetails.getUsername();
             model.addAttribute("currentUsername", username);
@@ -386,22 +376,18 @@ public class AnnonceController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-            // Récupérer la note de l'utilisateur pour cette annonce
             Integer userRating = annonceService.getUserRating(id, user.getId());
             model.addAttribute("userRating", userRating);
 
-            // Vérifier si l'utilisateur a déjà noté
             boolean hasRated = userRating != null;
             model.addAttribute("hasRated", hasRated);
 
-            // Si l'utilisateur a déjà noté, récupérer l'objet Rating complet
             if (hasRated) {
                 Optional<Rating> userRatingObj = ratingRepository.findByAnnonceIdAndUserId(id, user.getId());
                 userRatingObj.ifPresent(rating -> model.addAttribute("userRatingObj", rating));
             }
 
         } else {
-            // Utilisateur non connecté
             model.addAttribute("userRating", null);
             model.addAttribute("hasRated", false);
             model.addAttribute("currentUsername", null);
@@ -409,14 +395,13 @@ public class AnnonceController {
             model.addAttribute("isAdmin", false);
         }
 
-        // 7. Compter les annonces du vendeur
         Long vendeurAnnoncesCount = 0L;
         if (annonce.getVendeur() != null) {
             vendeurAnnoncesCount = annonceService.countByVendeurId(annonce.getVendeur().getId());
         }
         model.addAttribute("vendeurAnnoncesCount", vendeurAnnoncesCount);
 
-        // 8. Historique des annonces (optionnel)
+        // Historique des 5 dernières annonces consultées, gardé en session
         if (session != null) {
             List<Long> historic = (List<Long>) session.getAttribute("historic");
             if (historic == null) historic = new ArrayList<>();

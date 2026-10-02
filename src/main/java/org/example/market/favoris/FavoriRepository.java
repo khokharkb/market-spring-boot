@@ -27,7 +27,6 @@ public interface FavoriRepository extends JpaRepository<Favori, Long> {
     @Query("SELECT f FROM Favori f JOIN FETCH f.annonce WHERE f.user = :user ORDER BY f.dateAjout DESC")
     List<Favori> findFavorisWithAnnonceByUser(@Param("user") User user);
     Long countByAnnonce(Annonce annonce);
-    // Dans FavoriRepository
     @Query("SELECT f.annonce.id FROM Favori f WHERE f.user.id = :userId")
     List<Long> findAnnonceIdsByUserId(@Param("userId") Long userId);
 

@@ -1,6 +1,5 @@
 package org.example.market.security;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.example.market.user.DTO.RegistrationRequest;
 import org.example.market.user.User;
 import org.example.market.user.UserRepository;
@@ -18,8 +17,6 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    @Value("${ADMIN_PASSWORD}")
-    private String adminPassword;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -32,25 +29,6 @@ public class AuthController {
         return "register";
     }
 
-    @GetMapping("/create-admin")
-    public String createAdmin() {
-        // Créer un nouvel admin
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setEmail("khouloudrekabi@gmail.com");
-        admin.setPassword(passwordEncoder.encode(adminPassword));
-        admin.setNom("Admin");
-        admin.setPrenom("Admin");
-        admin.setTelephone("0550606060");
-        admin.setAdresse("123 Rue benboulaid");
-        admin.setVille("BLIDA");
-        admin.setActive(true);
-        admin.setRole("ADMIN");
-
-        userRepository.save(admin);
-
-        return "redirect:/login?message=Nouvel admin créé. Utilisez: admin / admin123";
-    }
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute RegistrationRequest request,
                                BindingResult result,
@@ -73,7 +51,6 @@ public class AuthController {
         }
 
         try {
-            // Créer un nouvel utilisateur avec toutes les informations
             User user = new User();
             user.setUsername(request.getUsername());
             user.setEmail(request.getEmail());
@@ -84,11 +61,10 @@ public class AuthController {
             user.setAdresse(request.getAdresse());
             user.setVille(request.getVille());
             user.setActive(true);
-            user.setRole("USER"); // Par défaut, rôle USER
+            user.setRole("USER");
 
             userRepository.save(user);
 
-            // Changé de "success" à "registered"
             return "redirect:/login?registered";
 
         } catch (Exception e) {
@@ -99,6 +75,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login";  // Cela retournera le template login.html
+        return "login";
     }
 }

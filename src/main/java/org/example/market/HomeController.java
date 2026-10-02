@@ -6,10 +6,9 @@ import org.example.market.favoris.Favori;
 import org.example.market.favoris.FavoriService;
 import org.example.market.message.Message;
 import org.example.market.message.MessageService;
-import org.example.market.panier.PanierService; // Ajouter cette importation
+import org.example.market.panier.PanierService;
 import org.example.market.user.User;
-import org.example.market.favoris.FavoriService;
-import org.example.market.user.UserRepository;// Ajouter cette importation
+import org.example.market.user.UserRepository;
 import org.example.market.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,18 +27,18 @@ public class HomeController {
 
     private final AnnonceService annonceService;
     private final MessageService messageService;
-    private final PanierService panierService; // Ajouter ceci
-    private final UserRepository userRepository; // Ajouter ceci
+    private final PanierService panierService;
+    private final UserRepository userRepository;
     private final FavoriService favoriService;
 
     public HomeController(AnnonceService annonceService,
                           MessageService messageService,
-                          PanierService panierService, // Ajouter ceci
+                          PanierService panierService,
                           UserRepository userRepository,
-                          FavoriService favoriService) { // Ajouter ceci
+                          FavoriService favoriService) {
         this.annonceService = annonceService;
         this.messageService = messageService;
-        this.panierService = panierService; // Ajouter ceci
+        this.panierService = panierService;
         this.userRepository = userRepository;
         this.favoriService = favoriService;
     }
@@ -52,14 +51,14 @@ public class HomeController {
             Principal principal,
             Model model) {
 
-        // If logout parameter is present, add a message
+        // Message affiché après la déconnexion
         if (logout != null && logout.equals("true")) {
             model.addAttribute("logoutMessage", "Vous avez été déconnecté avec succès.");
         }
 
         List<Annonce> annonces = annonceService.findAll();
 
-        // Filter by search if provided
+        // Filtrer par recherche
         if (search != null && !search.trim().isEmpty()) {
             final String searchLower = search.toLowerCase();
             annonces = annonces.stream()
@@ -68,25 +67,24 @@ public class HomeController {
                     .collect(Collectors.toList());
         }
 
-        // Filter by category if provided
+        // Filtrer par catégorie
         if (categorie != null && !categorie.trim().isEmpty()) {
             annonces = annonces.stream()
                     .filter(a -> categorie.equals(a.getCategorie()))
                     .collect(Collectors.toList());
         }
 
-        // Get all unique categories
+        // Catégories distinctes
         Set<String> categories = annonces.stream()
                 .map(Annonce::getCategorie)
                 .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .collect(Collectors.toSet());
 
-        // Limit to 12 announcements
+        // La page d'accueil n'affiche que les 12 premières annonces
         List<Annonce> featuredAnnonces = annonces.stream()
                 .limit(12)
                 .collect(Collectors.toList());
 
-        // Add data to model
         model.addAttribute("annonces", featuredAnnonces);
         model.addAttribute("allAnnonces", annonces);
         model.addAttribute("categories", categories);
@@ -96,18 +94,15 @@ public class HomeController {
         if (principal != null) {
             String username = principal.getName();
 
-            // Compter les messages non lus
             long unreadCount = messageService.countUnreadMessages(username);
             model.addAttribute("unreadCount", unreadCount);
 
-            // Récupérer les 3 derniers messages récents
+            // 3 derniers messages pour l'aperçu dans la barre de navigation
             List<Message> recentMessages = messageService.getRecentMessages(username, 3);
             model.addAttribute("recentMessages", recentMessages);
 
-            // Ajouter le nom d'utilisateur pour le profil
             model.addAttribute("currentUsername", username);
 
-            // Récupérer l'ID de l'utilisateur pour le panier
             try {
                 User user = userRepository.findByUsername(username)
                         .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -118,7 +113,6 @@ public class HomeController {
             }
 
         } else {
-            // Si pas connecté, mettre 0 et liste vide
             model.addAttribute("unreadCount", 0);
             model.addAttribute("recentMessages", List.of());
             model.addAttribute("currentUsername", null);
@@ -130,30 +124,26 @@ public class HomeController {
 
     @GetMapping("/favori")
     public String favoriPage(Principal principal, Model model) {
-        // Vérifier si l'utilisateur est connecté
         if (principal == null) {
             return "redirect:/login";
         }
 
         String username = principal.getName();
 
-        // Récupérer l'utilisateur
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        // Récupérer les annonces favorites de l'utilisateur
         List<Favori> favoris = favoriService.getFavorisByUser(user);
 
         List<Long> favoriteAnnonceIds = favoris.stream()
                 .map(favori -> favori.getAnnonce().getId())
                 .collect(Collectors.toList());
 
-        // Ajouter les données au modèle
         model.addAttribute("favoris", favoris);
         model.addAttribute("favoriteAnnonceIds", favoriteAnnonceIds);
         model.addAttribute("currentUsername", username);
 
-        // Ajouter les autres attributs pour la navigation (messages, panier, etc.)
+        // Données de la barre de navigation (messages, panier...)
         long unreadCount = messageService.countUnreadMessages(username);
         model.addAttribute("unreadCount", unreadCount);
 

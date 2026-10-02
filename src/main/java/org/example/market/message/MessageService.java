@@ -32,37 +32,32 @@ public class MessageService {
         Annonce annonce = annonceRepository.findById(annonceId).orElseThrow();
         User seller = annonce.getVendeur();
 
-        // Find or create conversation
+        // Retrouve la conversation de cette annonce, ou en crée une
         Conversation conversation = conversationRepository
-                .findByAnnonce(annonce) // Try to find any conversation for this annonce
+                .findByAnnonce(annonce)
                 .orElseGet(() -> {
-                    // If no conversation exists, create a new one
-                    // Only buyers should be able to start conversations
+                    // Seul un acheteur peut démarrer une conversation
                     if (sender.equals(seller)) {
                         throw new IllegalStateException("Seller cannot start a conversation with themselves");
                     }
 
                     Conversation c = new Conversation();
                     c.setAnnonce(annonce);
-                    c.setBuyer(sender);  // The person starting the conversation is the buyer
-                    c.setSeller(seller);  // The annonce owner is the seller
+                    c.setBuyer(sender);
+                    c.setSeller(seller);
                     c.setLastUpdated(LocalDateTime.now());
                     return conversationRepository.save(c);
                 });
 
-        // Now we have a conversation, determine who the receiver should be
-        // If sender is buyer, receiver should be seller
-        // If sender is seller, receiver should be buyer
+        // Le destinataire est l'autre participant de la conversation
         User receiver;
 
         if (sender.equals(conversation.getBuyer())) {
-            // Sender is the buyer, so receiver is the seller
             receiver = conversation.getSeller();
         } else if (sender.equals(conversation.getSeller())) {
-            // Sender is the seller, so receiver is the buyer
             receiver = conversation.getBuyer();
         } else {
-            // This shouldn't happen - sender is neither buyer nor seller in this conversation
+            // L'expéditeur ne fait pas partie de cette conversation
             throw new IllegalStateException("You are not part of this conversation");
         }
 
@@ -112,7 +107,6 @@ public class MessageService {
         }).toList();
     }
 
-    // Add these missing methods:
     public List<Message> getInbox(String username) {
         User user = userService.findByUsername(username);
         return messageRepository.findByReceiverOrderBySentAtDesc(user);
@@ -151,27 +145,21 @@ public class MessageService {
                 })
                 .orElse(null);
     }
-    /**
-         * Count unread messages for a user
-         */
-        public long countUnreadMessages(String username) {
-            User user = userService.findByUsername(username);
-            return messageRepository.countByReceiverAndReadFalse(user);
-        }
+    public long countUnreadMessages(String username) {
+        User user = userService.findByUsername(username);
+        return messageRepository.countByReceiverAndReadFalse(user);
+    }
 
-        /**
-         * Get recent messages for a user (limit by count)
-         */
-        public List<Message> getRecentMessages(String username, int limit) {
-            User user = userService.findByUsername(username);
-            // First get all messages for the user
-            List<Message> allMessages = messageRepository.findBySenderOrReceiverOrderBySentAtDesc(user, user);
+    /** Les {@code limit} messages les plus récents, envoyés ou reçus. */
+    public List<Message> getRecentMessages(String username, int limit) {
+        User user = userService.findByUsername(username);
+        List<Message> allMessages = messageRepository.findBySenderOrReceiverOrderBySentAtDesc(user, user);
 
-            // Return only the specified number of recent messages
-            return allMessages.stream()
-                    .limit(limit)
-                    .collect(Collectors.toList());
-        }
+        return allMessages.stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
     public void markMessagesAsRead(Long conversationId, String username) {
         List<Message> unreadMessages = messageRepository.findByConversationIdAndReceiverUsernameAndReadFalse(conversationId, username);
         for (Message m : unreadMessages) {

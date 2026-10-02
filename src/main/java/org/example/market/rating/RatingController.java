@@ -18,7 +18,7 @@ public class RatingController {
 
     private final AnnonceService annonceService;
     private final UserRepository userRepository;
-    private final RatingRepository ratingRepository; // Ajoutez cette dépendance
+    private final RatingRepository ratingRepository;
 
     public RatingController(AnnonceService annonceService,
                             UserRepository userRepository,

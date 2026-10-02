@@ -29,9 +29,8 @@ public class Panier {
     @Column(name = "date_ajout")
     private LocalDateTime dateAjout = LocalDateTime.now();
 
-    // === CONSTRUCTEURS OBLIGATOIRES ===
+    // Constructeur vide requis par JPA
     public Panier() {
-        // Constructeur vide requis par JPA
     }
 
     public Panier(User user, Annonce annonce) {
@@ -45,9 +44,7 @@ public class Panier {
         this.quantite = quantite;
     }
 
-    // ==================================
-    // GETTERS (tous les getters)
-    // ==================================
+    // Getters
 
     public Long getId() {
         return id;
@@ -69,9 +66,7 @@ public class Panier {
         return dateAjout;
     }
 
-    // ==================================
-    // SETTERS (tous les setters)
-    // ==================================
+    // Setters
 
     public void setId(Long id) {
         this.id = id;
@@ -93,9 +88,7 @@ public class Panier {
         this.dateAjout = dateAjout;
     }
 
-    // ==================================
-    // MÉTHODES UTILES (optionnelles)
-    // ==================================
+    // Gestion de la quantité
 
     public void incrementerQuantite() {
         this.quantite++;
@@ -114,9 +107,7 @@ public class Panier {
         return 0.0;
     }
 
-    // ==================================
-    // Méthodes standard (equals, hashCode, toString)
-    // ==================================
+    // equals, hashCode, toString
 
     @Override
     public boolean equals(Object o) {

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "annonce")  // Ajoute cette annotation
+@Table(name = "annonce")
 public class Annonce {
     @Column(name = "view_count")
     private Integer viewCount = 0;
@@ -42,24 +42,21 @@ public class Annonce {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "vendeur_id")  // Ajoute ceci pour être explicite
+    @JoinColumn(name = "vendeur_id")
     private User vendeur;
 
     @Column(name = "views", nullable = false)
     private Integer views = 0;
 
-    // CORRECTION ICI : Déplace l'annotation @JoinColumn
     @ManyToOne
-    @JoinColumn(name = "user_id")  // Place-la AVEC @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    // === NOUVEAUX CHAMPS POUR LES NOTES ===
-
-    // Map pour stocker les notes par utilisateur
+    // Notes : id de l'utilisateur -> nombre d'étoiles
     @ElementCollection
     @CollectionTable(
             name = "annonce_ratings",
-            joinColumns = @JoinColumn(name = "annonce_id")  // Simplifié
+            joinColumns = @JoinColumn(name = "annonce_id")
     )
     @MapKeyColumn(name = "user_id")
     @Column(name = "rating")
@@ -71,7 +68,6 @@ public class Annonce {
     @Column(name = "rating_count")
     private Integer ratingCount = 0;
 
-    // === CONSTRUCTEUR ===
     public Annonce() {
         this.userRatings = new HashMap<>();
         this.averageRating = 0.0;
@@ -209,7 +205,7 @@ public class Annonce {
         this.ratingCount = ratingCount;
     }
 
-    // === MÉTHODES UTILITAIRES POUR LES NOTES ===
+    // Gestion des notes
 
     public void addRating(Long userId, Integer stars) {
         if (stars < 1 || stars > 5) {

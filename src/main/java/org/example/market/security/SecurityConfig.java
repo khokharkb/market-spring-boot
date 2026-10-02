@@ -26,13 +26,15 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // AJOUTE CETTE LIGNE POUR L'API :
-                        .requestMatchers("/api/v1/annonces/**").permitAll()  // ← AJOUTE ÇA !
+                        // Connexion et inscription depuis l'application mobile
+                        .requestMatchers("/api/mobile/**").permitAll()
                         .requestMatchers("/", "/register", "/login", "/css/**",
                                 "/js/**", "/images/**", "/uploads/**",
                                 "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                // L'API mobile n'utilise pas de formulaire, donc pas de jeton CSRF
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/mobile/**"))
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
@@ -47,24 +49,23 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Garde les sessions
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                // Autorise les requêtes API cross-origin avec credentials
+                // Requêtes cross-origin de l'application mobile et du front en développement
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(Arrays.asList(
                             "http://localhost:3000",
                             "capacitor://localhost",
                             "http://localhost",
-                            "http://10.0.2.2:8080" // Pour émulateur Android
+                            "http://10.0.2.2:8080" // Émulateur Android
                     ));
                     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(Arrays.asList("*"));
-                    config.setAllowCredentials(true); // IMPORTANT pour les cookies
-                    config.setExposedHeaders(Arrays.asList("Set-Cookie")); // Expose les cookies
+                    config.setAllowCredentials(true);
+                    config.setExposedHeaders(Arrays.asList("Set-Cookie"));
                     return config;
                 }));
-
 
         return http.build();
     }

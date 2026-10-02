@@ -14,7 +14,7 @@ import java.util.List;
 @Controller
 @CrossOrigin(origins = {"http://localhost:3000", "capacitor://localhost", "http://localhost"})
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')") // Seulement accessible aux admins
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final UserRepository userRepository;
@@ -30,13 +30,13 @@ public class AdminController {
     public String dashboard(Model model) {
         long userCount = userRepository.count();
         long annonceCount = annonceService.count();
-        List<User> users = userRepository.findAll(); // Récupérer tous les utilisateurs
+        List<User> users = userRepository.findAll();
 
         model.addAttribute("userCount", userCount);
         model.addAttribute("annonceCount", annonceCount);
-        model.addAttribute("users", users); // Pour afficher dans le tableau
+        model.addAttribute("users", users);
 
-        return "dashboard"; // CHANGÉ ICI : "dashboard" au lieu de "admin/dashboard"
+        return "dashboard";
     }
 
     @PostMapping("/delete-user/{id}")

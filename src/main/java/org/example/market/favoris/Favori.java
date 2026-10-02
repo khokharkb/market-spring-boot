@@ -27,21 +27,17 @@ public class Favori {
     @Column(name = "date_ajout")
     private LocalDateTime dateAjout;
 
-    // === CONSTRUCTEURS ===
-
-    // Constructeur sans paramètres (requis par JPA)
+    // Constructeur sans paramètres requis par JPA
     public Favori() {
         this.dateAjout = LocalDateTime.now();
     }
 
-    // Constructeur avec User et Annonce
     public Favori(User user, Annonce annonce) {
         this.user = user;
         this.annonce = annonce;
         this.dateAjout = LocalDateTime.now();
     }
 
-    // Constructeur avec tous les champs
     public Favori(Long id, User user, Annonce annonce, LocalDateTime dateAjout) {
         this.id = id;
         this.user = user;
@@ -49,7 +45,7 @@ public class Favori {
         this.dateAjout = (dateAjout != null) ? dateAjout : LocalDateTime.now();
     }
 
-    // === BUILDER MANUEL ===
+    // Builder écrit à la main (sans Lombok)
 
     public static Builder builder() {
         return new Builder();
@@ -88,7 +84,7 @@ public class Favori {
         }
     }
 
-    // === GETTERS ET SETTERS ===
+    // Getters et setters
 
     public Long getId() {
         return id;

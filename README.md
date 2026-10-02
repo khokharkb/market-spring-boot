@@ -79,8 +79,11 @@ Passwords are not stored in the code:
 
 | Variable | Description |
 |---|---|
-| `DB_PASSWORD` | MySQL password (user `root`) |
-| `ADMIN_PASSWORD` | Password for the admin account created on startup |
+| `DB_PASSWORD` | MySQL password |
+| `DB_URL` | *(optional)* JDBC URL, defaults to the local MySQL database |
+| `DB_USERNAME` | *(optional)* MySQL user, defaults to `root` |
+| `ADMIN_PASSWORD` | Password of the `admin` account, created on first startup |
+| `ADMIN_EMAIL` | *(optional)* Email of the `admin` account |
 
 In IntelliJ: *Run → Edit Configurations → Environment variables*.
 

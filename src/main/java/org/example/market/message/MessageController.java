@@ -1,5 +1,6 @@
 package org.example.market.message;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.annonce.Annonce;
 import org.example.market.annonce.AnnonceService;
 import org.example.market.user.User;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.List;
 
+@Slf4j
 @Controller
 @CrossOrigin(origins = {"http://localhost:3000", "capacitor://localhost", "http://localhost"})
 @RequestMapping("/messages")
@@ -27,38 +29,37 @@ public class MessageController {
         this.userService = userService;
     }
 
-    // Main messages page - shows conversation list
+    // Page principale : liste des conversations
     @GetMapping
     public String messagesPage(Principal principal, Model model) {
         String username = principal.getName();
         List<ConversationDTO> conversations = messageService.getConversations(username);
         model.addAttribute("conversations", conversations);
         model.addAttribute("view", "conversations");
-        model.addAttribute("currentUser", username); // Add currentUser
+        model.addAttribute("currentUser", username);
         return "messages";
     }
+
     @GetMapping("/conversation/{conversationId}")
     public String viewConversation(@PathVariable Long conversationId,
                                    Principal principal,
                                    Model model) {
         String username = principal.getName();
 
-        // MARQUE LES MESSAGES COMME LUS
+        // Ouvrir la conversation marque ses messages comme lus
         messageService.markMessagesAsRead(conversationId, username);
 
-        // Récupère les messages pour cette conversation
         List<Message> messages = messageService.getMessages(conversationId);
         model.addAttribute("messages", messages);
 
-        // Récupère toutes les conversations pour la sidebar
+        // Toutes les conversations, pour la barre latérale
         List<ConversationDTO> conversations = messageService.getConversations(username);
         model.addAttribute("conversations", conversations);
 
-        // Set la conversation sélectionnée
         model.addAttribute("selectedConversationId", conversationId);
         model.addAttribute("view", "single-conversation");
 
-        // Get annonce details from the conversation
+        // Infos de l'annonce liée à la conversation
         ConversationDTO selectedConv = conversations.stream()
                 .filter(c -> c.getConversationId().equals(conversationId))
                 .findFirst()
@@ -78,7 +79,7 @@ public class MessageController {
     }
 
 
-    // Inbox view
+    // Messages reçus
     @GetMapping("/inbox")
     public String getInbox(Principal principal, Model model) {
         String username = principal.getName();
@@ -89,7 +90,7 @@ public class MessageController {
         return "messages";
     }
 
-    // Sent messages view
+    // Messages envoyés
     @GetMapping("/sent")
     public String getSentMessages(Principal principal, Model model) {
         String username = principal.getName();
@@ -100,7 +101,7 @@ public class MessageController {
         return "messages";
     }
 
-    // All messages view
+    // Tous les messages
     @GetMapping("/all")
     public String getAllMessages(Principal principal, Model model) {
         String username = principal.getName();
@@ -123,7 +124,7 @@ public class MessageController {
 
             Long actualAnnonceId = annonceId;
 
-            // If annonceId is not provided, find it from conversation
+            // Si l'annonce n'est pas fournie, on la retrouve via la conversation
             if (actualAnnonceId == null) {
                 List<ConversationDTO> conversations = messageService.getConversations(username);
                 ConversationDTO conversation = conversations.stream()
@@ -133,18 +134,16 @@ public class MessageController {
                 actualAnnonceId = conversation.getAnnonceId();
             }
 
-            // Send the message
             messageService.sendMessage(actualAnnonceId, messageContent, username);
 
             redirectAttributes.addFlashAttribute("successMessage", "Message envoyé avec succès!");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Échec de l'envoi du message (conversation {})", conversationId, e);
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Erreur lors de l'envoi du message: " + e.getMessage());
         }
 
-        // Redirect back to the conversation
         return "redirect:/messages/conversation/" + conversationId;
     }
 }

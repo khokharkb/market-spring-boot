@@ -1,5 +1,5 @@
 @ApplicationModule(
-        type = ApplicationModule.Type.OPEN,  // Allow other modules to access
+        type = ApplicationModule.Type.OPEN,
         displayName = "User Module"
 )
 package org.example.market.user;

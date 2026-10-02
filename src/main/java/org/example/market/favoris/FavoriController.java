@@ -1,6 +1,7 @@
 package org.example.market.favoris;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.annonce.Annonce;
 import org.example.market.annonce.AnnonceRepository;
 import org.example.market.user.User;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Controller
 @RequestMapping("/favoris")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class FavoriController {
     private final UserRepository userRepository;
     private final FavoriService favoriService;
 
-    // === AJOUTER UNE ANNONCE AUX FAVORIS ===
+    // Ajouter une annonce aux favoris
     @PostMapping("/ajouter/{annonceId}")
     public String ajouterFavori(@PathVariable Long annonceId,
                                 @AuthenticationPrincipal UserDetails userDetails,
@@ -54,7 +56,7 @@ public class FavoriController {
 
             // Créer et sauvegarder le favori
             Favori favori = Favori.builder()
-                    .user(user)  // CECI EST IMPORTANT - ne pas oublier l'utilisateur!
+                    .user(user)
                     .annonce(annonce)
                     .dateAjout(LocalDateTime.now())
                     .build();
@@ -64,7 +66,7 @@ public class FavoriController {
             redirectAttributes.addFlashAttribute("success", "Annonce ajoutée aux favoris !");
 
         } catch (Exception e) {
-            e.printStackTrace(); // Pour le débogage
+            log.error("Échec de l'ajout aux favoris (annonce {})", annonceId, e);
             redirectAttributes.addFlashAttribute("error",
                     "Erreur lors de l'ajout aux favoris: " + e.getMessage());
         }
@@ -72,7 +74,7 @@ public class FavoriController {
         return "redirect:/annonces";
     }
 
-    // === SUPPRIMER UNE ANNONCE DES FAVORIS ===
+    // Retirer une annonce des favoris
     @PostMapping("/supprimer/{annonceId}")
     public String supprimerFavori(@PathVariable Long annonceId,
                                   @AuthenticationPrincipal UserDetails userDetails,
@@ -88,13 +90,12 @@ public class FavoriController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-            // Appel au service pour supprimer le favori
             favoriService.supprimerFavori(annonceId, user);
 
             redirectAttributes.addFlashAttribute("success", "Annonce retirée des favoris");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Échec de la suppression du favori (annonce {})", annonceId, e);
             redirectAttributes.addFlashAttribute("error",
                     "Erreur lors de la suppression: " + e.getMessage());
         }
@@ -102,7 +103,7 @@ public class FavoriController {
         return "redirect:/annonces";
     }
 
-    // === PAGE DES FAVORIS ===
+    // Page des favoris
     @GetMapping
     public String mesFavoris(@AuthenticationPrincipal UserDetails userDetails,
                              RedirectAttributes redirectAttributes,
@@ -128,7 +129,7 @@ public class FavoriController {
             return "favoris";
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Échec du chargement des favoris", e);
             redirectAttributes.addFlashAttribute("error",
                     "Erreur lors du chargement des favoris: " + e.getMessage());
             return "redirect:/annonces";

@@ -34,11 +34,11 @@ public class User {
     @Column(name = "nom")
     private String nom;
 
-    @Column(name = "prenom") // Note: le nom de la colonne est "prenim" dans la table
+    @Column(name = "prenom")
     private String prenom;
 
     @Pattern(regexp = "^(0|\\+213)[567]\\d{8}$", message = "Numéro de téléphone algérien invalide")
-    @Column(name = "telephone") // Note: le nom de la colonne est "tlephone" dans la table
+    @Column(name = "telephone")
     private String telephone;
 
     @Column(name = "adresse")

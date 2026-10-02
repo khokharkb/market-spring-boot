@@ -29,10 +29,9 @@ public class Rating {
     @Column(columnDefinition = "TEXT")
     private String comment;
     @Column(name = "created_at")
-    @CreationTimestamp  // Si vous utilisez cette annotation
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // Constructeurs
     public Rating() {
         this.createdAt = LocalDateTime.now();
     }
