@@ -126,7 +126,7 @@ public class FavoriController {
             model.addAttribute("favoris", favoris);
             model.addAttribute("pageTitle", "Mes Favoris");
 
-            return "favoris";
+            return "redirect:/favori";
 
         } catch (Exception e) {
             log.error("Échec du chargement des favoris", e);
