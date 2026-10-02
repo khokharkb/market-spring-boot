@@ -1,7 +1,7 @@
 # 🛒 Market — Classified Ads Marketplace
 
 A **marketplace** web application where users can buy, sell and trade items through classified ads. The project includes a **web application** (Spring Boot + Thymeleaf) and an **Android mobile app** (Capacitor) connected to a REST API.
-
+🔗 **Live demo:**https://market-vogs.onrender.com *(the first load may take about a minute while the free server wakes up)*
 ![Home page](docs/screenshots/home.png)
 
 ---
