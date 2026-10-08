@@ -429,3 +429,39 @@ button[type="submit"].loading::after {
         transform: rotate(360deg);
     }
 }
+/* Séparateur "OU" */
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: #888;
+    font-size: 14px;
+}
+.separator::before,
+.separator::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+.separator span {
+    padding: 0 12px;
+}
+
+/* Bouton Google */
+.google-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.google-btn:hover {
+    background: #f5f5f5;
+}

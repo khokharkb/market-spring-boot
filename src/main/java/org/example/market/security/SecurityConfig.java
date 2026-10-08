@@ -22,13 +22,13 @@ import static org.springframework.security.web.header.writers.ClearSiteDataHeade
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,GoogleLoginSuccessHandler googleLoginSuccessHandler) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // Connexion et inscription depuis l'application mobile
                         .requestMatchers("/api/mobile/**").permitAll()
-                        .requestMatchers("/", "/register", "/login", "/css/**",
+                        .requestMatchers("/", "/register", "/login","/error", "/css/**",
                                 "/js/**", "/images/**", "/uploads/**",
                                 "/webjars/**").permitAll()
                         .anyRequest().authenticated()
@@ -39,6 +39,10 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
+                )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/login")
+                        .successHandler(googleLoginSuccessHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -51,7 +55,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                // Requêtes cross-origin de l'application mobile et du front en développement
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(Arrays.asList(

@@ -51,7 +51,12 @@
 
             <button type="submit">Se connecter</button>
         </form>
-
+        <div class="separator">
+            <span>OU</span>
+        </div>
+        <a th:href="@{/oauth2/authorization/google}" class="google-btn">
+            Continuer avec Google
+        </a>
         <div class="login-footer">
             <p class="text-center">
                 Pas encore de compte ?
